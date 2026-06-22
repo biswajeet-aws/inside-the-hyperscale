@@ -1,0 +1,52 @@
+# Netlify configuration for Inside the Hyperscale
+# (c) 2026 JEET — Strong security headers + cache-friendly defaults
+
+[build]
+  publish = "."
+
+# === Security headers applied to every response ===
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Force HTTPS for 2 years; include subdomains; preload-eligible
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+    # Block clickjacking via iframe embedding
+    X-Frame-Options = "DENY"
+
+    # Block MIME-sniffing attacks
+    X-Content-Type-Options = "nosniff"
+
+    # Restrict referrer information sent to other sites
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # Disable unused browser APIs that could be abused
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), midi=()"
+
+    # Content Security Policy — locks down what scripts/images/etc. can load
+    # Allows: same-origin, Microsoft Clarity (analytics), Counter API (login counter), Google Fonts
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.clarity.ms https://*.clarity.ms https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.clarity.ms https://*.clarity.ms https://api.counterapi.dev https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-src https://*.firebaseapp.com https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+
+    # Cross-Origin policies — defense in depth
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
+
+    # Legacy XSS filter (modern browsers ignore, but harmless)
+    X-XSS-Protection = "1; mode=block"
+
+    # Tell DNS-prefetch to be conservative
+    X-DNS-Prefetch-Control = "off"
+
+# === Cache control — no caching of the HTML so updates push instantly ===
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# === Pretty URL for the index ===
+[[redirects]]
+  from = "/index"
+  to = "/"
+  status = 301
