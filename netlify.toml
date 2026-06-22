@@ -28,8 +28,10 @@
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.clarity.ms https://*.clarity.ms https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.clarity.ms https://*.clarity.ms https://api.counterapi.dev https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-src https://*.firebaseapp.com https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 
     # Cross-Origin policies — defense in depth
-    Cross-Origin-Opener-Policy = "same-origin"
-    Cross-Origin-Resource-Policy = "same-origin"
+    # IMPORTANT: must be "same-origin-allow-popups" (NOT "same-origin") so Google OAuth popup
+    # can postMessage the auth result back to the site. Otherwise users see "Sign-in cancelled".
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+    Cross-Origin-Resource-Policy = "cross-origin"
 
     # Legacy XSS filter (modern browsers ignore, but harmless)
     X-XSS-Protection = "1; mode=block"

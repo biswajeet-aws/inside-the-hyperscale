@@ -30,7 +30,7 @@
      you got from the Firebase Console (Step 4 of the setup). -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
     from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp,
            collection, query, orderBy, limit, getDocs }
@@ -56,7 +56,7 @@
   window.firebaseApi = {
     isConfigured,
     adminEmail: ADMIN_EMAIL,
-    GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+    GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged,
     doc, getDoc, setDoc, updateDoc, increment, serverTimestamp,
     collection, query, orderBy, limit, getDocs,
     app: null, auth: null, db: null
@@ -5119,8 +5119,28 @@ async function handleGoogleSignin() {
   try {
     const provider = new api.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    await api.signInWithPopup(api.auth, provider);
-    // onAuthStateChanged handler below will pick it up
+
+    // Detect mobile — popups are unreliable on mobile, use redirect directly
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      // signInWithRedirect navigates away — onAuthStateChanged picks it up on return
+      await api.signInWithRedirect(api.auth, provider);
+      return;
+    }
+
+    try {
+      await api.signInWithPopup(api.auth, provider);
+      // onAuthStateChanged handler below will pick it up
+    } catch (popupErr) {
+      // Popup failed (blocked, COOP issue, etc.) — fall back to full-page redirect
+      const fallbackCodes = ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
+      if (popupErr && fallbackCodes.includes(popupErr.code)) {
+        console.warn('[Auth] popup failed, falling back to redirect', popupErr.code);
+        await api.signInWithRedirect(api.auth, provider);
+        return;
+      }
+      throw popupErr;
+    }
   } catch (e) {
     console.error('[Auth] sign-in failed', e);
     let msg = 'Sign-in failed. Please try again.';
