@@ -5539,7 +5539,7 @@ function boot() {
   installDevtoolsDeterrent();
 
   // Wait for Firebase to be ready
-  const setupAuth = () => {
+  const setupAuth = async () => {
     const api = window.firebaseApi;
     if (!api) return false;
     if (!api.isConfigured) {
@@ -5550,7 +5550,40 @@ function boot() {
       err.classList.add('show');
       return true;
     }
-    // Wire up auth state changes
+
+    // CRITICAL for mobile / Safari: must explicitly process any pending redirect
+    // result BEFORE wiring up onAuthStateChanged. Without this, users returning
+    // from Google sign-in via signInWithRedirect see the login screen again
+    // because Firebase hasn't finished processing the auth callback.
+    const statusEl = document.getElementById('loginStatus');
+    const errEl = document.getElementById('loginErr');
+    try {
+      // Show "Signing you in..." spinner while we check for redirect result
+      if (statusEl) statusEl.style.display = 'flex';
+      const result = await api.getRedirectResult(api.auth);
+      if (result && result.user) {
+        console.log('[Auth] redirect sign-in complete for', result.user.email);
+        // onAuthStateChanged will fire next and call onAuthChange(user)
+      }
+    } catch (e) {
+      console.error('[Auth] getRedirectResult failed', e);
+      let msg = 'Sign-in failed. Please try again.';
+      if (e && e.code === 'auth/unauthorized-domain') {
+        msg = '⚠️ This domain is not authorized in Firebase Auth → Settings → Authorized domains.';
+      } else if (e && e.code === 'auth/account-exists-with-different-credential') {
+        msg = 'An account already exists with this email under a different provider.';
+      } else if (e && e.code === 'auth/web-storage-unsupported') {
+        msg = '⚠️ Your browser is blocking storage. Enable cookies / disable strict tracking prevention for this site.';
+      }
+      if (errEl) {
+        errEl.textContent = msg;
+        errEl.classList.add('show');
+      }
+      if (statusEl) statusEl.style.display = 'none';
+    }
+
+    // Wire up auth state changes (fires once now with current user OR null,
+    // and then again on any future sign-in / sign-out)
     api.onAuthStateChanged(api.auth, onAuthChange);
     return true;
   };
