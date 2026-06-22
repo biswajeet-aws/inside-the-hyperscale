@@ -47,6 +47,24 @@
     Pragma = "no-cache"
     Expires = "0"
 
+# === Firebase Auth — same-origin handler proxy ===
+# Required for mobile Chrome / iOS Safari signInWithRedirect to work.
+# Proxies /__/auth/* to firebaseapp.com so the auth handler appears to come
+# from the same origin as the site. Without this, browsers (especially mobile)
+# block cross-origin storage access and the redirect loop occurs.
+# MUST come before any catch-all redirects.
+[[redirects]]
+  from = "/__/auth/*"
+  to = "https://inside-the-hyperscale.firebaseapp.com/__/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/__/firebase/*"
+  to = "https://inside-the-hyperscale.firebaseapp.com/__/firebase/:splat"
+  status = 200
+  force = true
+
 # === Pretty URL for the index ===
 [[redirects]]
   from = "/index"

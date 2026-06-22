@@ -39,7 +39,10 @@
   // === REPLACE THIS WITH YOUR ACTUAL firebaseConfig OBJECT ===
   const firebaseConfig = {
     apiKey: "AIzaSyD3RofLAs6_HrFdjCoxx49XLJf3J8EkSFs",
-    authDomain: "inside-the-hyperscale.firebaseapp.com",
+    // authDomain points at our own custom domain (Netlify) — the Netlify
+    // rewrite below proxies /__/auth/* to firebaseapp.com so the OAuth handler
+    // is served same-origin. This fixes the mobile redirect loop on Chrome/Safari.
+    authDomain: "inside-the-hyperscale.netlify.app",
     projectId: "inside-the-hyperscale",
     storageBucket: "inside-the-hyperscale.firebasestorage.app",
     messagingSenderId: "341690629397",
@@ -5120,20 +5123,19 @@ async function handleGoogleSignin() {
     const provider = new api.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    // Detect mobile — popups are unreliable on mobile, use redirect directly
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) {
-      // signInWithRedirect navigates away — onAuthStateChanged picks it up on return
-      await api.signInWithRedirect(api.auth, provider);
-      return;
-    }
-
+    // Strategy: always TRY popup first (now that COOP is allow-popups and authDomain
+    // is same-origin via Netlify rewrite, popups work on mobile Chrome too).
+    // Only fall back to redirect if popup is genuinely blocked.
     try {
       await api.signInWithPopup(api.auth, provider);
       // onAuthStateChanged handler below will pick it up
     } catch (popupErr) {
-      // Popup failed (blocked, COOP issue, etc.) — fall back to full-page redirect
-      const fallbackCodes = ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
+      const fallbackCodes = [
+        'auth/popup-blocked',
+        'auth/popup-closed-by-user',
+        'auth/cancelled-popup-request',
+        'auth/operation-not-supported-in-this-environment'
+      ];
       if (popupErr && fallbackCodes.includes(popupErr.code)) {
         console.warn('[Auth] popup failed, falling back to redirect', popupErr.code);
         await api.signInWithRedirect(api.auth, provider);
