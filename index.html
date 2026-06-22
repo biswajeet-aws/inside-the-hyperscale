@@ -39,10 +39,10 @@
   // === REPLACE THIS WITH YOUR ACTUAL firebaseConfig OBJECT ===
   const firebaseConfig = {
     apiKey: "AIzaSyD3RofLAs6_HrFdjCoxx49XLJf3J8EkSFs",
-    // authDomain points at our own custom domain (Netlify) — the Netlify
-    // rewrite below proxies /__/auth/* to firebaseapp.com so the OAuth handler
-    // is served same-origin. This fixes the mobile redirect loop on Chrome/Safari.
-    authDomain: "inside-the-hyperscale.netlify.app",
+    // authDomain stays as firebaseapp.com — this is the value Google's OAuth
+    // client is registered with. Changing it without updating the OAuth client
+    // in Google Cloud Console causes `redirect_uri_mismatch` errors.
+    authDomain: "inside-the-hyperscale.firebaseapp.com",
     projectId: "inside-the-hyperscale",
     storageBucket: "inside-the-hyperscale.firebasestorage.app",
     messagingSenderId: "341690629397",
