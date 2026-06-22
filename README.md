@@ -19,3 +19,8 @@ Built and maintained by JEET — [LinkedIn](https://linkedin.com/in/biswajeet-sa
 - Firestore (cross-device progress sync)
 
 Free forever. Not for profit.
+
+---
+
+_Last auto-deploy test: GitHub → Netlify wired up on 2026-06-22._
+
