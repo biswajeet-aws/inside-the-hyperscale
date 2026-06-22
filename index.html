@@ -4693,6 +4693,10 @@ function phasesInSection(sectionId) {
   return STUDY_PLAN.phases.filter(p => p.section === sectionId);
 }
 function isPhaseUnlocked(phase) {
+  // ADMIN BYPASS: JEET (the author/admin) gets full access to all phases
+  // without needing to pass exams — so content can be reviewed/edited daily.
+  // Public users still need to pass exams to unlock the next phase.
+  if (isAdmin) return true;
   const sectionPhases = phasesInSection(phase.section);
   const idxInSection = sectionPhases.findIndex(p => p.id === phase.id);
   if (idxInSection === 0) return true;  // First phase of any section is always open
