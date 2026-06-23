@@ -89,7 +89,14 @@
   --radius: 14px; --radius-sm: 8px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Disable global smooth scroll — it makes the "focus jump" on mobile visible
+   as a long upward animation. Mobile browsers auto-scroll focused checkboxes
+   into view; combined with smooth-scroll it looks like the page "goes up".
+   We keep smooth scroll for explicit navigation by setting behavior:'smooth'
+   on those scrollTo calls directly. */
+html { scroll-behavior: auto; overflow-anchor: none; }
+body { overflow-anchor: none; }
+.topic-item input[type="checkbox"] { scroll-margin: 999px; }  /* don't auto-scroll into view on focus */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg); color: var(--ink);
@@ -4900,9 +4907,22 @@ function renderCourseCard(course) {
       const checked = cs.completedTopics.includes(t.id);
       const hasContent = t.content && t.content.trim().length > 0;
       const row = el('label', { class: 'topic-item' + (checked ? ' done' : '') });
-      const cb = el('input', { type: 'checkbox' });
+      const cb = el('input', { type: 'checkbox', tabindex: '-1' });
       if (checked) cb.checked = true;
       cb.addEventListener('change', () => toggleTopic(course.id, t.id));
+      // MOBILE FIX: prevent the browser from auto-scrolling the focused
+      // checkbox into view (which on mobile looks like the page "jumping up").
+      // We preventDefault on mousedown/touchstart so focus doesn't move at all.
+      row.addEventListener('mousedown', (ev) => {
+        if (ev.target.tagName !== 'INPUT') ev.preventDefault();
+      });
+      row.addEventListener('touchstart', (ev) => {
+        // Don't preventDefault on touch — that would block the click itself.
+        // But blur any focused element before the touch so no scroll-into-view fires.
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+      }, { passive: true });
       row.appendChild(cb);
       row.appendChild(el('span', { class: 'tnum' }, [String(idx + 1).padStart(2, '0')]));
       row.appendChild(el('span', { class: 'ttxt' }, [t.title]));
