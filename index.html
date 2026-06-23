@@ -673,7 +673,7 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
 }
 .intro-aurora { z-index: 0; opacity: 0.7; }
 .intro-canvas { z-index: 1; }
-.intro-bolts  { z-index: 2; pointer-events: none; }
+.intro-bolts  { z-index: 2; pointer-events: none; opacity: 0.95; }
 .intro-vignette { position: absolute; inset: 0;
   background: radial-gradient(ellipse at center, transparent 0%, transparent 35%, rgba(5,13,9,0.7) 100%);
   z-index: 3; pointer-events: none; }
@@ -717,11 +717,16 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
   letter-spacing: 2px; line-height: 1.0; margin-bottom: 22px;
   min-height: 1.1em; position: relative;
   text-shadow: 0 0 40px rgba(212,165,55,0.25); }
+.intro-title { display: flex; justify-content: center; align-items: baseline;
+  flex-wrap: nowrap; white-space: nowrap; }
 .intro-title .ch { opacity: 0; display: inline-block;
-  transform: translateY(30px) rotateX(-30deg); transform-origin: bottom center; }
-.intro-title .ch.in { animation: introCharIn 0.5s cubic-bezier(.34,1.56,.64,1) forwards; }
+  transform: translateY(28px); }
+.intro-title .ch.in { animation: introCharIn 0.55s cubic-bezier(.34,1.56,.64,1) forwards; }
 @keyframes introCharIn {
-  to { opacity: 1; transform: translateY(0) rotateX(0); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 760px) {
+  .intro-title { white-space: normal; flex-wrap: wrap; }
 }
 
 /* Gold shimmer that sweeps across title after typewriter completes */
@@ -6246,26 +6251,25 @@ function playCinematicIntro() {
     setTimeout(() => span.classList.add('in'), 1500 + i * 55);
   });
 
-  // Audio cues at the visual peaks
-  setTimeout(() => playSound('whoosh'), 200);    // lightning hits
-  setTimeout(() => playSound('whoosh'), 450);
+  // Audio cues at the visual peaks (subtle, ambient datacenter mood)
+  setTimeout(() => playSound('whoosh'), 300);    // data stream begins
   setTimeout(() => playSound('ting'),   1500);   // J monogram materializes
-  setTimeout(() => playSound('ting'),   2700);   // title completes
-  setTimeout(() => playSound('chord'),  3700);   // stats reveal
+  setTimeout(() => playSound('ting'),   2900);   // title completes
+  setTimeout(() => playSound('chord'),  4200);   // stats reveal
 
-  // Gold shimmer sweep across title at t=2.8s
-  setTimeout(() => overlay.classList.add('shimmer-go'), 2700);
-  // Tagline at t=3.0s
-  setTimeout(() => overlay.classList.add('tagline-in'), 3000);
-  // Stats burst at t=3.7s with count-up
+  // Gold shimmer sweep across title at t=2.9s
+  setTimeout(() => overlay.classList.add('shimmer-go'), 2900);
+  // Tagline at t=3.3s — slightly later so user has time to absorb title
+  setTimeout(() => overlay.classList.add('tagline-in'), 3300);
+  // Stats burst at t=4.5s with longer count-up so people can read each number
   setTimeout(() => {
     overlay.classList.add('stats-in');
-    countUp(document.getElementById('introStat1'), 15, 1400);
-    countUp(document.getElementById('introStat2'), 258, 1700);
-    countUp(document.getElementById('introStat3'), 150, 1550);
-  }, 3700);
-  // CTA "Step inside →" pulses in at t=4.7s
-  setTimeout(() => overlay.classList.add('cta-in'), 4700);
+    countUp(document.getElementById('introStat1'), 15, 1600);
+    countUp(document.getElementById('introStat2'), 258, 1900);
+    countUp(document.getElementById('introStat3'), 150, 1750);
+  }, 4500);
+  // CTA "Step inside →" pulses in at t=6.2s
+  setTimeout(() => overlay.classList.add('cta-in'), 6200);
 
   const skipBtn = document.getElementById('introSkip');
   return new Promise(resolve => {
@@ -6275,11 +6279,11 @@ function playCinematicIntro() {
         overlay.classList.remove('active');
         cleanup();
         resolve();
-      }, 1000);
+      }, 1100);
     };
     skipBtn.onclick = finish;
-    // Auto-finish after 6.5s (longer for the new cinematic)
-    setTimeout(finish, 6500);
+    // Auto-finish after 9.5s — plenty of time to read everything
+    setTimeout(finish, 9500);
   });
 }
 
@@ -6325,28 +6329,63 @@ function startParticleNetwork(canvas) {
   let raf;
   let startT = performance.now();
 
-  // Lightning bolts that fire 3 times in first 800ms
-  const bolts = [];
-  if (bctx) {
-    function fireBolt(delay) {
-      setTimeout(() => {
-        const startX = Math.random() < 0.5 ? -50 : W + 50;
-        const startY = Math.random() * H * 0.4;
-        const endX = W / 2, endY = H / 2;
-        const segs = [];
-        let cx = startX, cy = startY;
-        const steps = 18;
-        for (let i = 0; i <= steps; i++) {
-          const t = i / steps;
-          const tx = startX + (endX - startX) * t + (Math.random() - 0.5) * 80 * dpr;
-          const ty = startY + (endY - startY) * t + (Math.random() - 0.5) * 80 * dpr;
-          segs.push([cx, cy, tx, ty]);
-          cx = tx; cy = ty;
+  // MATRIX-STYLE DATA RAIN — vertical streams of falling characters
+  // representing live data flowing through the hyperscale infrastructure.
+  // Uses technical glyphs (hex, binary, datacenter notation) in gold on dark.
+  const matrixChars = '01アイウエオカキクケコサシスセソタチツテト∑∆Ω∂∇√∞⊕⊗◇◆◈⚡10kVMWAVΦXfHzdBnsμsmsℏ';
+  const fontSize = 18 * dpr;
+  const colWidth = fontSize * 1.1;
+  const colCount = Math.floor(W / colWidth);
+  const drops = [];
+  for (let i = 0; i < colCount; i++) {
+    drops.push({
+      y: -Math.random() * H,
+      speed: (Math.random() * 1.6 + 0.6) * dpr,
+      trail: Math.floor(Math.random() * 14 + 6),
+      lastChar: '',
+      charChangeAt: 0
+    });
+  }
+  function drawMatrixRain(now) {
+    if (!bctx) return;
+    // Fade overlay for trail effect (instead of clear)
+    bctx.fillStyle = 'rgba(5,13,9,0.18)';
+    bctx.fillRect(0, 0, W, H);
+    bctx.font = `${fontSize}px 'Cormorant Garamond', monospace`;
+    bctx.textAlign = 'center';
+    for (let i = 0; i < drops.length; i++) {
+      const d = drops[i];
+      const x = i * colWidth + colWidth / 2;
+      // Draw the trail
+      for (let t = 0; t < d.trail; t++) {
+        const ty = d.y - t * fontSize;
+        if (ty < 0 || ty > H) continue;
+        const ch = matrixChars[Math.floor((Math.random() * 7919 + i * 13 + t) % matrixChars.length)];
+        const fade = 1 - (t / d.trail);
+        if (t === 0) {
+          // Head — bright white-gold with glow
+          bctx.shadowBlur = 14 * dpr;
+          bctx.shadowColor = 'rgba(245,232,211,1)';
+          bctx.fillStyle = `rgba(255,250,235,1)`;
+        } else if (t < 3) {
+          bctx.shadowBlur = 6 * dpr;
+          bctx.shadowColor = 'rgba(212,165,55,0.9)';
+          bctx.fillStyle = `rgba(245,232,211,${fade * 0.95})`;
+        } else {
+          bctx.shadowBlur = 0;
+          bctx.fillStyle = `rgba(212,165,55,${fade * 0.7})`;
         }
-        bolts.push({ segs: segs, life: 1, born: performance.now() });
-      }, delay);
+        bctx.fillText(ch, x, ty);
+      }
+      d.y += d.speed;
+      // Reset when off screen
+      if (d.y - d.trail * fontSize > H) {
+        d.y = -Math.random() * H * 0.3;
+        d.speed = (Math.random() * 1.6 + 0.6) * dpr;
+        d.trail = Math.floor(Math.random() * 14 + 6);
+      }
     }
-    fireBolt(150); fireBolt(380); fireBolt(620);
+    bctx.shadowBlur = 0;
   }
 
   // Aurora — soft flowing gradient waves
@@ -6436,30 +6475,8 @@ function startParticleNetwork(canvas) {
       ctx.fill();
     }
 
-    // Lightning bolts
-    if (bctx) {
-      bctx.clearRect(0, 0, W, H);
-      for (let i = bolts.length - 1; i >= 0; i--) {
-        const b = bolts[i];
-        const age = (performance.now() - b.born) / 400;
-        b.life = Math.max(0, 1 - age);
-        if (b.life <= 0) { bolts.splice(i, 1); continue; }
-        bctx.lineCap = 'round';
-        // Outer glow
-        bctx.shadowBlur = 22 * dpr;
-        bctx.shadowColor = `rgba(245,232,211,${b.life})`;
-        bctx.strokeStyle = `rgba(245,232,211,${b.life})`;
-        bctx.lineWidth = 4 * dpr * b.life;
-        bctx.beginPath();
-        b.segs.forEach(s => { bctx.moveTo(s[0], s[1]); bctx.lineTo(s[2], s[3]); });
-        bctx.stroke();
-        // Inner bright core
-        bctx.shadowBlur = 0;
-        bctx.strokeStyle = `rgba(255,255,255,${b.life})`;
-        bctx.lineWidth = 1.5 * dpr;
-        bctx.stroke();
-      }
-    }
+    // Matrix data rain — cinematic data-flowing-through-the-datacenter effect
+    drawMatrixRain(elapsed);
 
     raf = requestAnimationFrame(frame);
   }
