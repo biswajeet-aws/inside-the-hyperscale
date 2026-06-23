@@ -305,6 +305,90 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
   .section-tab .st-main { font-size: 19px; }
 }
 
+
+/* === INTERACTIVE AUTO-TOUR === */
+.itour-root { position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  display: none; }
+.itour-root.active { display: block; pointer-events: auto; }
+
+/* Spotlight overlay — dims everything except the highlighted element */
+.itour-dim { position: fixed; inset: 0; background: rgba(5,13,9,0.78);
+  backdrop-filter: blur(2px); transition: clip-path 0.6s cubic-bezier(.4,0,.2,1),
+  background 0.4s; }
+.itour-dim.full { /* full dim, no cutout */ }
+
+/* The spotlight cutout halo */
+.itour-spotlight { position: fixed; border-radius: 14px;
+  box-shadow: 0 0 0 4px rgba(212,165,55,0.7), 0 0 0 9999px rgba(5,13,9,0.78),
+              0 0 40px rgba(212,165,55,0.4);
+  pointer-events: none; z-index: 9001;
+  transition: all 0.6s cubic-bezier(.4,0,.2,1);
+  background: transparent; }
+
+/* The caption card next to the spotlight */
+.itour-caption { position: fixed; max-width: 380px; min-width: 280px;
+  background: linear-gradient(135deg, #1B3A2F 0%, #0F4C3A 100%);
+  color: #F5E8D3; border-radius: 16px;
+  padding: 22px 26px; box-shadow: 0 16px 50px rgba(0,0,0,0.5);
+  border: 1px solid rgba(212,165,55,0.4); z-index: 9002;
+  transition: all 0.5s cubic-bezier(.4,0,.2,1); }
+.itour-caption .itour-step-num { font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; color: #D4A537; text-transform: uppercase;
+  margin-bottom: 8px; }
+.itour-caption h4 { font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 700; color: #F5E8D3;
+  margin-bottom: 8px; line-height: 1.2; }
+.itour-caption p { font-size: 14px; line-height: 1.55;
+  color: rgba(245,232,211,0.88); margin-bottom: 16px; }
+.itour-caption p strong { color: #D4A537; }
+
+/* Progress bar inside caption */
+.itour-progress { height: 3px; background: rgba(212,165,55,0.15);
+  border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+.itour-progress > div { height: 100%; background: linear-gradient(90deg, #D4A537, #F5E8D3);
+  width: 0%; transition: width 0.2s linear; }
+
+/* Footer controls */
+.itour-foot { display: flex; gap: 8px; align-items: center;
+  justify-content: space-between; }
+.itour-foot .left, .itour-foot .right { display: flex; gap: 8px; }
+.itour-btn { padding: 8px 14px; border-radius: 8px; font-size: 12.5px;
+  font-weight: 700; letter-spacing: 0.5px;
+  background: rgba(245,232,211,0.08); color: #F5E8D3;
+  border: 1px solid rgba(212,165,55,0.3); cursor: pointer;
+  transition: all 0.2s; font-family: 'Inter', sans-serif; }
+.itour-btn:hover { background: rgba(212,165,55,0.2); border-color: #D4A537; }
+.itour-btn.primary { background: linear-gradient(135deg, #D4A537, #B8862B);
+  color: #050d09; border-color: transparent; }
+.itour-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(212,165,55,0.3); }
+.itour-btn.skip { color: rgba(245,232,211,0.6); border-color: rgba(245,232,211,0.15); }
+
+/* Animated fake cursor that demonstrates clicks */
+.itour-cursor { position: fixed; width: 28px; height: 28px; z-index: 9003;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.3s, left 1.0s cubic-bezier(.4,0,.2,1),
+              top 1.0s cubic-bezier(.4,0,.2,1); }
+.itour-cursor.show { opacity: 1; }
+.itour-cursor svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 12px rgba(212,165,55,0.6)); }
+.itour-cursor.clicking::after { content: ''; position: absolute;
+  top: 50%; left: 50%; width: 40px; height: 40px;
+  border: 2px solid #D4A537; border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: cursorClick 0.6s ease-out forwards; }
+@keyframes cursorClick {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* "Watch tour" button — replay anytime */
+.tour-launch-btn { display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px; background: rgba(212,165,55,0.12);
+  border: 1px solid rgba(212,165,55,0.4); color: var(--primary-deep);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; }
+.tour-launch-btn:hover { background: rgba(212,165,55,0.25);
+  border-color: var(--gold); transform: translateY(-1px); }
+
 /* === Tour overlay === */
 .tour-overlay { position: fixed; inset: 0; background: rgba(15,27,22,0.78);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -1069,6 +1153,19 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
 </main>
 
 <div class="exam-modal-overlay" id="examModal"></div>
+
+<!-- Interactive auto-tour -->
+<div class="itour-root" id="itourRoot">
+  <div class="itour-dim" id="itourDim"></div>
+  <div class="itour-spotlight" id="itourSpot" style="display:none;"></div>
+  <div class="itour-caption" id="itourCap" style="display:none;"></div>
+  <div class="itour-cursor" id="itourCursor">
+    <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 3 L24 13 L14 14 L10 24 Z" fill="#D4A537" stroke="#050d09" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</div>
+
 <div class="tour-overlay" id="tourOverlay"></div>
 <div class="toast-stack" id="toastStack"></div>
 
@@ -6021,83 +6118,288 @@ function installCopyProtection() {
   });
 }
 
-/* === Guided Tour === */
-const TOUR_STEPS = [
+/* === INTERACTIVE AUTO-TOUR === */
+const ITOUR_STEPS = [
   {
+    key: 'welcome',
     title: '👋 Welcome to Inside the Hyperscale',
-    body: 'This is a free training course for datacenter electrical & mechanical engineers, built for fresher engineers entering the industry. Let me show you around in 6 quick steps.',
+    body: 'Let me give you a quick interactive tour — I will actually show you how to use everything. Sit back, watch, then dive in.',
+    target: null,        // centered card
+    duration: 4500
   },
   {
-    title: '📚 Two parallel sections',
-    body: 'The course is split into <strong>Electrical (E1–E7)</strong> and <strong>Mechanical (M1–M8)</strong>. They are independent — you can study either in parallel. Click the tabs at the top of the phase list to switch.',
+    key: 'sections',
+    title: '🎯 Two parallel tracks',
+    body: 'The course is split into <strong>Electrical</strong> (E1–E7) and <strong>Mechanical</strong> (M1–M8). You can study either or both in parallel.',
     target: '#sectionTabs',
+    duration: 4500,
+    demo: { action: 'click-each-section' }
   },
   {
+    key: 'phases',
     title: '🔓 Phases unlock by passing exams',
-    body: 'Within each section, phases are sequential. Pass the <strong>10-question exam</strong> at the end of each phase with <strong>60%</strong> to unlock the next phase. 🔒 means locked.',
+    body: 'Each track has phases. Pass each phase\'s 10-question exam at <strong>60%</strong> to unlock the next. 🔒 means locked.',
     target: '#phaseNav',
+    duration: 5000
   },
   {
-    title: '📖 Tap a topic to read in detail',
-    body: 'Each chapter has a list of sections. Tap the <strong>▸ arrow</strong> next to any topic to expand the full study material. Use the checkbox to mark it as read.',
-    target: '#courseGrid',
+    key: 'courses',
+    title: '📚 Each phase has chapters',
+    body: 'Inside every phase you will find chapter cards. Each chapter has a list of topic sections.',
+    target: '#courseGrid > .course:first-child',
+    duration: 4500
   },
   {
+    key: 'expand',
+    title: '▸ Tap the arrow to read',
+    body: 'Click the <strong>▸ arrow</strong> next to any topic to expand the full study material — concepts, formulas, key takeaways.',
+    target: '#courseGrid .topic-item:nth-child(1)',
+    duration: 5500,
+    demo: { action: 'expand-topic' }
+  },
+  {
+    key: 'check',
+    title: '✓ Mark topics as read',
+    body: 'Tap the checkbox to mark a topic done. Your progress saves automatically across all devices.',
+    target: '#courseGrid .topic-item:nth-child(1)',
+    duration: 5000,
+    demo: { action: 'tick-topic' }
+  },
+  {
+    key: 'exam',
     title: '📝 Take the phase exam',
-    body: 'When you have read through the chapters, scroll to the bottom and hit <strong>Take Exam</strong>. Pass 6/10 to unlock the next phase. Retake any time, no penalty.',
+    body: 'Scroll to the bottom of each phase and hit <strong>Take Exam</strong>. Pass 6 of 10 to unlock the next phase. Retake any time — no penalty.',
     target: '#examWrap',
+    duration: 5000
   },
   {
-    title: '💬 Found a mistake? Tell me.',
-    body: 'I am human and can make mistakes. If you spot an error, please <strong>take a screenshot</strong> and send it to me on LinkedIn. The link is in the footer. Your feedback makes this resource better for the next engineer.',
+    key: 'streak',
+    title: '🔥 Build a daily streak',
+    body: 'Come back daily — your streak counter grows. Hit milestones to unlock achievements.',
+    target: '.welcome-banner .welcome-streak',
+    duration: 4000
   },
+  {
+    key: 'feedback',
+    title: '💬 Found a mistake? Tell me.',
+    body: 'I am human and can make mistakes. Spot an error? Take a screenshot and DM me on LinkedIn — the link is in the footer.',
+    target: 'footer',
+    duration: 4500
+  },
+  {
+    key: 'end',
+    title: '🚀 You are ready.',
+    body: 'That is the whole tour. Click <strong>Start learning</strong> below — or hit <em>How to use</em> in the header any time to replay this.',
+    target: null,
+    duration: 5000
+  }
 ];
-function startGuidedTour(markSeen) {
-  const overlay = document.getElementById('tourOverlay');
-  overlay.innerHTML = '';
-  overlay.classList.add('open');
-  let stepIdx = 0;
-  function showStep() {
-    overlay.innerHTML = '';
-    const s = TOUR_STEPS[stepIdx];
-    const card = el('div', { class: 'tour-card' });
-    card.appendChild(el('div', { class: 'tour-step-num' }, [`Step ${stepIdx + 1} of ${TOUR_STEPS.length}`]));
-    card.appendChild(el('h3', {}, [s.title]));
-    const body = el('p', { class: 'tour-body' });
-    body.innerHTML = s.body;
-    card.appendChild(body);
-    const dots = el('div', { class: 'tour-dots' });
-    TOUR_STEPS.forEach((_, i) => dots.appendChild(el('span', { class: 'tour-dot' + (i === stepIdx ? ' active' : '') }, [])));
-    card.appendChild(dots);
-    const foot = el('div', { class: 'tour-foot' });
-    if (stepIdx > 0) {
-      foot.appendChild(el('button', { class: 'tour-btn',
-        onClick: () => { stepIdx--; showStep(); } }, ['← Back']));
-    } else {
-      foot.appendChild(el('button', { class: 'tour-btn skip',
-        onClick: () => endTour() }, ['Skip tour']));
+
+let _itourStop = false;
+let _itourTimer = null;
+let _itourProgTimer = null;
+let _itourCurrentStep = 0;
+let _itourPromise = null;
+
+function startInteractiveTour(opts = {}) {
+  if (_itourPromise) return _itourPromise;
+  const markSeen = opts.markSeen !== false;
+  const root = document.getElementById('itourRoot');
+  if (!root) return Promise.resolve();
+  root.classList.add('active');
+  _itourStop = false;
+  _itourCurrentStep = 0;
+
+  _itourPromise = (async () => {
+    for (let i = 0; i < ITOUR_STEPS.length; i++) {
+      if (_itourStop) break;
+      _itourCurrentStep = i;
+      await runItourStep(ITOUR_STEPS[i], i);
     }
-    if (stepIdx < TOUR_STEPS.length - 1) {
-      foot.appendChild(el('button', { class: 'tour-btn primary',
-        onClick: () => { stepIdx++; showStep(); } }, ['Next →']));
-    } else {
-      foot.appendChild(el('button', { class: 'tour-btn primary',
-        onClick: () => endTour() }, ["Start learning ✓"]));
-    }
-    card.appendChild(foot);
-    overlay.appendChild(card);
-  }
-  function endTour() {
-    overlay.classList.remove('open');
-    overlay.innerHTML = '';
-    if (markSeen) {
-      const a = getAuth();
-      if (a && a.username) {
-        localStorage.setItem(TOUR_SEEN_KEY_PREFIX + a.username.toLowerCase(), '1');
+    endInteractiveTour(markSeen);
+  })().catch(e => {
+    console.warn('[itour]', e);
+    endInteractiveTour(markSeen);
+  });
+  return _itourPromise;
+}
+
+function endInteractiveTour(markSeen) {
+  _itourStop = true;
+  if (_itourTimer) { clearTimeout(_itourTimer); _itourTimer = null; }
+  if (_itourProgTimer) { clearInterval(_itourProgTimer); _itourProgTimer = null; }
+  const root = document.getElementById('itourRoot');
+  if (root) root.classList.remove('active');
+  const cur = document.getElementById('itourCursor');
+  if (cur) cur.classList.remove('show', 'clicking');
+  _itourPromise = null;
+  if (markSeen && currentUser) {
+    localStorage.setItem('jeet_itour_seen_' + currentUser.uid, '1');
+    // Also persist to Firestore so it follows the user across devices
+    try {
+      if (window.firebaseApi && window.firebaseApi.updateDoc && userDocRef) {
+        window.firebaseApi.updateDoc(userDocRef, { tourSeen: true }).catch(() => {});
       }
-    }
+    } catch (e) {}
   }
-  showStep();
+}
+
+function runItourStep(step, idx) {
+  return new Promise(resolve => {
+    const spot = document.getElementById('itourSpot');
+    const cap = document.getElementById('itourCap');
+    const dim = document.getElementById('itourDim');
+    const targetEl = step.target ? document.querySelector(step.target) : null;
+
+    // Position spotlight
+    if (targetEl) {
+      // Scroll the target into view first
+      try {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (e) {}
+      setTimeout(() => {
+        const r = targetEl.getBoundingClientRect();
+        const pad = 8;
+        spot.style.display = 'block';
+        spot.style.left = (r.left - pad) + 'px';
+        spot.style.top = (r.top - pad) + 'px';
+        spot.style.width = (r.width + pad * 2) + 'px';
+        spot.style.height = (r.height + pad * 2) + 'px';
+      }, 350);
+    } else {
+      spot.style.display = 'none';
+    }
+
+    // Position caption smartly (top, bottom, or center)
+    cap.style.display = 'block';
+    cap.innerHTML = `
+      <div class="itour-step-num">Step ${idx + 1} of ${ITOUR_STEPS.length}</div>
+      <h4>${step.title}</h4>
+      <p>${step.body}</p>
+      <div class="itour-progress"><div id="itourProgBar"></div></div>
+      <div class="itour-foot">
+        <div class="left">
+          <button class="itour-btn skip" id="itourSkipBtn">Skip tour</button>
+        </div>
+        <div class="right">
+          ${idx > 0 ? '<button class="itour-btn" id="itourBackBtn">← Back</button>' : ''}
+          <button class="itour-btn primary" id="itourNextBtn">${idx === ITOUR_STEPS.length - 1 ? 'Start learning ✓' : 'Next →'}</button>
+        </div>
+      </div>
+    `;
+
+    // Smart position caption (avoid covering target)
+    setTimeout(() => {
+      if (targetEl) {
+        const r = targetEl.getBoundingClientRect();
+        const capRect = cap.getBoundingClientRect();
+        const margin = 24;
+        // Try below first
+        let top = r.bottom + margin;
+        if (top + capRect.height > window.innerHeight - 20) {
+          // Try above
+          top = r.top - capRect.height - margin;
+          if (top < 20) {
+            // Default to right side
+            top = Math.max(20, Math.min(window.innerHeight - capRect.height - 20, r.top));
+          }
+        }
+        let left = r.left + r.width / 2 - capRect.width / 2;
+        left = Math.max(16, Math.min(window.innerWidth - capRect.width - 16, left));
+        cap.style.top = top + 'px';
+        cap.style.left = left + 'px';
+      } else {
+        // Center caption when no target
+        cap.style.top = '50%';
+        cap.style.left = '50%';
+        cap.style.transform = 'translate(-50%, -50%)';
+        return;
+      }
+      cap.style.transform = 'none';
+    }, 400);
+
+    // Bind controls
+    const skip = document.getElementById('itourSkipBtn');
+    const back = document.getElementById('itourBackBtn');
+    const next = document.getElementById('itourNextBtn');
+    if (skip) skip.onclick = () => { _itourStop = true; cleanup(); resolve(); };
+    if (back) back.onclick = () => { _itourCurrentStep = Math.max(0, _itourCurrentStep - 2); cleanup(); resolve(); };
+    if (next) next.onclick = () => { cleanup(); resolve(); };
+
+    // Animate progress bar over step.duration
+    const bar = document.getElementById('itourProgBar');
+    const startT = performance.now();
+    if (_itourProgTimer) clearInterval(_itourProgTimer);
+    _itourProgTimer = setInterval(() => {
+      const pct = Math.min(100, ((performance.now() - startT) / step.duration) * 100);
+      if (bar) bar.style.width = pct + '%';
+      if (pct >= 100) {
+        clearInterval(_itourProgTimer);
+        _itourProgTimer = null;
+      }
+    }, 50);
+
+    // Run the demo action if any (after 600ms delay so spotlight is settled)
+    let demoStarted = false;
+    if (step.demo) {
+      setTimeout(() => {
+        if (!_itourStop) { demoStarted = true; runItourDemo(step.demo); }
+      }, 800);
+    }
+
+    // Auto-advance after duration
+    _itourTimer = setTimeout(() => {
+      cleanup();
+      resolve();
+    }, step.duration);
+
+    function cleanup() {
+      if (_itourTimer) { clearTimeout(_itourTimer); _itourTimer = null; }
+      if (_itourProgTimer) { clearInterval(_itourProgTimer); _itourProgTimer = null; }
+    }
+  });
+}
+
+async function runItourDemo(demo) {
+  if (demo.action === 'click-each-section') {
+    // Demo: click Mechanical tab, pause, click Electrical tab back
+    const sectionTabs = document.querySelectorAll('#sectionTabs .section-tab');
+    if (sectionTabs.length >= 2) {
+      await moveCursorToAndClick(sectionTabs[1]);  // Mechanical
+      await wait(1200);
+      await moveCursorToAndClick(sectionTabs[0]);  // back to Electrical
+    }
+  } else if (demo.action === 'expand-topic') {
+    const expand = document.querySelector('#courseGrid .topic-item:nth-child(1) .texpand');
+    if (expand) await moveCursorToAndClick(expand);
+  } else if (demo.action === 'tick-topic') {
+    const cb = document.querySelector('#courseGrid .topic-item:nth-child(1)');
+    if (cb) await moveCursorToAndClick(cb);
+  }
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function moveCursorToAndClick(el) {
+  const cur = document.getElementById('itourCursor');
+  if (!cur || !el) return;
+  const r = el.getBoundingClientRect();
+  const tx = r.left + r.width / 2 - 14;
+  const ty = r.top + r.height / 2 - 14;
+  cur.classList.add('show');
+  cur.style.left = tx + 'px';
+  cur.style.top = ty + 'px';
+  await wait(1050);
+  cur.classList.add('clicking');
+  try { el.click(); } catch (e) {}
+  await wait(700);
+  cur.classList.remove('clicking');
+  await wait(300);
+}
+
+// Backwards-compatible name — startGuidedTour now delegates to the interactive tour
+function startGuidedTour(markSeen) {
+  return startInteractiveTour({ markSeen: markSeen });
 }
 
 /* === Firebase auth state handler === */
@@ -6126,9 +6428,16 @@ async function onAuthChange(user) {
       setInterval(renderAdminPanel, ADMIN_REFRESH_MS);
     }
     toast('Welcome, ' + (user.displayName || user.email) + ' 👋', 'gold');
-    // First-time tour
-    if (!localStorage.getItem(TOUR_SEEN_KEY_PREFIX + user.uid)) {
-      setTimeout(() => startGuidedTour(true), 800);
+    // First-time interactive tour — auto-plays for new users only.
+    // Replay anytime via the "How to use" button in the header.
+    const tourLocalKey = 'jeet_itour_seen_' + user.uid;
+    const seenLocal = localStorage.getItem(tourLocalKey) === '1';
+    const seenRemote = !!(state && state.tourSeen);
+    if (!seenLocal && !seenRemote) {
+      // Wait for intro to finish, then start the auto-tour
+      setTimeout(() => {
+        try { startInteractiveTour({ markSeen: true }); } catch (e) {}
+      }, 1500);
     }
   } else {
     // Signed out
