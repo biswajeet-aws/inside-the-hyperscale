@@ -967,6 +967,262 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
   .achv-toast { min-width: 240px; }
 }
 
+
+
+/* ============================================================
+   MOBILE-FIRST RESPONSIVE OVERRIDES — ships everything below
+   650px to a clean, touch-friendly, single-column layout.
+   Three breakpoints: 900px (tablet), 650px (mobile), 400px (small).
+   ============================================================ */
+
+/* iOS Safari & mobile browser fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari */
+  body { min-height: -webkit-fill-available; }
+  .login-screen { min-height: -webkit-fill-available; }
+  .intro-overlay { min-height: -webkit-fill-available; }
+}
+html, body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+input, button, select, textarea { font-size: 16px; /* prevents iOS zoom on focus */ }
+
+/* Disable hover effects on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  *:hover { transition: none !important; }
+  button:hover, a:hover, .course:hover, .teaser:hover, .achv-toast:hover { transform: none !important; }
+}
+
+/* Hide non-essential decorative elements on smaller screens */
+@media (max-width: 650px) {
+  .sound-toggle { width: 38px; height: 38px; font-size: 15px; bottom: 12px; left: 12px; }
+  .achv-toast-stack { top: auto; bottom: 70px; right: 10px; left: 10px; }
+  .achv-toast { min-width: 0; max-width: 100%; }
+}
+
+/* === LOGIN PAGE — single column on mobile === */
+@media (max-width: 900px) {
+  .login-shell { grid-template-columns: 1fr; gap: 24px; padding: 12px; max-width: 600px; }
+  .login-pitch { text-align: center; }
+  .login-pretitle { margin-left: auto; margin-right: auto; }
+  .login-bigtitle { font-size: clamp(28px, 7vw, 42px); }
+  .login-bigsub { font-size: 14px; margin-left: auto; margin-right: auto; }
+  .login-stats-bar { margin-left: auto; margin-right: auto; padding: 12px 4px; }
+  .ls-num { font-size: 26px; }
+  .ls-lbl { font-size: 8.5px; letter-spacing: 1.5px; }
+  .login-stat { padding: 0 8px; }
+  .login-teasers { justify-content: center; }
+  .teaser { font-size: 11.5px; padding: 6px 11px; }
+  .login-card { padding: 28px 22px; max-width: 100%; }
+  .login-card h2 { font-size: 26px; }
+}
+@media (max-width: 420px) {
+  .login-bigtitle { font-size: 26px; line-height: 1.1; }
+  .login-bigsub { font-size: 13px; line-height: 1.55; }
+  .login-stats-bar { padding: 10px 2px; }
+  .ls-num { font-size: 22px; }
+  .login-card { padding: 24px 18px; }
+  .login-card .login-mark { width: 50px; height: 50px; font-size: 28px; }
+  .login-card h2 { font-size: 22px; }
+  .google-signin-btn { padding: 13px 16px; font-size: 14.5px; }
+  .login-trust { font-size: 11px; padding: 10px 12px; }
+}
+
+/* === CINEMATIC INTRO — readable on mobile === */
+@media (max-width: 650px) {
+  .intro-content { padding: 24px 14px; }
+  .intro-mark-wrap { width: 80px; height: 80px; margin-bottom: 20px; }
+  .intro-mark { font-size: 44px; border-radius: 18px; }
+  .intro-prelabel { font-size: 9px; letter-spacing: 3px; margin-bottom: 10px; }
+  .intro-title { font-size: clamp(28px, 9vw, 44px) !important;
+    letter-spacing: 1px; white-space: normal !important; flex-wrap: wrap !important; }
+  .intro-tagline { font-size: 14px; padding: 0 8px; margin-bottom: 24px; }
+  .intro-stats { padding: 12px 16px; gap: 0; }
+  .intro-stat { padding: 0 12px; }
+  .intro-stat-num { font-size: 28px; }
+  .intro-stat-lbl { font-size: 8.5px; letter-spacing: 1.5px; }
+  .intro-stat-divider { height: 24px; }
+  .intro-cta { font-size: 11px; letter-spacing: 3px; margin-top: 22px; }
+  .intro-skip { top: 16px; right: 16px; padding: 7px 14px; font-size: 10px; }
+}
+@media (max-width: 380px) {
+  .intro-stats { flex-direction: column; gap: 6px; padding: 14px 18px; border-radius: 14px; }
+  .intro-stat-divider { display: none; }
+  .intro-stat { padding: 4px 0; }
+}
+
+/* === HEADER (signed-in nav) — compact mobile === */
+@media (max-width: 650px) {
+  .headbar, .nav-inner { padding: 10px 14px; }
+  .nav-brand h1 { font-size: 17px; }
+  .nav-brand p { font-size: 11px; }
+  .nav-brand-mark { width: 38px; height: 38px; font-size: 22px; }
+  .nav-actions { gap: 6px; }
+  .nav-actions .tour-launch-btn span,
+  .nav-actions .logout-btn span { display: none; }
+  .nav-actions button { padding: 8px 10px; min-width: 38px; }
+}
+
+/* === WELCOME BANNER — stack on mobile === */
+@media (max-width: 650px) {
+  .welcome-banner { flex-direction: column; align-items: stretch; gap: 14px;
+    padding: 16px 18px; text-align: center; }
+  .welcome-greeting { font-size: 22px; }
+  .welcome-streak { align-self: center; }
+}
+
+/* === HERO CARD === */
+@media (max-width: 650px) {
+  .hero { padding: 20px 16px; }
+  .hero h2, .hero-stage h2 { font-size: 22px; line-height: 1.25; }
+  .hero p, .hero-sub { font-size: 13.5px; }
+  .hero-stats, .stat-cards { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .stat-card { padding: 12px; }
+  .stat-card .num { font-size: 22px; }
+  .stat-card .lbl { font-size: 10px; }
+}
+
+/* === SECTION TABS — stack on mobile === */
+@media (max-width: 650px) {
+  #sectionTabs, .section-tabs { grid-template-columns: 1fr !important;
+    display: grid !important; gap: 8px !important; padding: 0 8px; }
+  .section-tab { padding: 12px 14px; }
+  .section-tab .st-main { font-size: 16px; }
+  .section-tab .st-sub { font-size: 11px; }
+}
+
+/* === PHASE NAV — horizontal scroll on mobile with snap === */
+@media (max-width: 650px) {
+  #phaseNav { display: flex !important; overflow-x: auto; flex-wrap: nowrap !important;
+    gap: 8px !important; padding: 8px 12px 14px; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+  #phaseNav::-webkit-scrollbar { height: 4px; }
+  #phaseNav::-webkit-scrollbar-thumb { background: rgba(212,165,55,0.4); border-radius: 2px; }
+  .phase-tab { flex: 0 0 auto; scroll-snap-align: start;
+    padding: 9px 14px; font-size: 13px; min-width: auto; white-space: nowrap; }
+  .phase-tab .pcount { font-size: 10.5px; padding: 1px 6px; }
+}
+
+/* === PHASE HEADER === */
+@media (max-width: 650px) {
+  #phaseHeader, .phase-header { padding: 16px; }
+  .phase-header h2, #phaseHeader h2 { font-size: 20px; }
+  .phase-header p, #phaseHeader p { font-size: 13px; }
+  .phase-header .ph-stats, #phaseHeader .ph-stats { font-size: 11.5px; }
+}
+
+/* === COURSE GRID — single column on mobile === */
+@media (max-width: 760px) {
+  #courseGrid, .courses, .course-grid { grid-template-columns: 1fr !important;
+    gap: 14px !important; padding: 0 12px !important; }
+}
+@media (max-width: 650px) {
+  .course { padding: 16px; border-radius: 14px; }
+  .course-head { gap: 10px; margin-bottom: 8px; }
+  .course-icon { width: 36px; height: 36px; font-size: 18px; }
+  .course-title-block h4 { font-size: 15.5px; line-height: 1.3; }
+  .course-title-block .meta { font-size: 11px; }
+  .course-tags { gap: 6px; margin-bottom: 10px; }
+  .tag { font-size: 10.5px; padding: 4px 9px; }
+  .bar-block .top { font-size: 11px; }
+  .section-title { font-size: 12px; margin: 14px 0 10px; letter-spacing: 1.2px; }
+  .resource { padding: 9px 12px; gap: 8px; }
+  .resource .rname { font-size: 13px; }
+  .topic-list { gap: 6px; }
+  .topic-item { padding: 11px 12px; gap: 10px; min-height: 48px; /* touch-friendly */ }
+  .topic-item .tnum { font-size: 15px; min-width: 24px; }
+  .topic-item .ttxt { font-size: 13.5px; line-height: 1.4; }
+  .topic-item input[type="checkbox"] { width: 20px; height: 20px; }
+  .topic-item .texpand { width: 30px; height: 30px; font-size: 16px; /* bigger touch target */ }
+  .topic-content { padding: 14px 16px; font-size: 13.5px; line-height: 1.65; }
+  .topic-content h5 { font-size: 13.5px; }
+  .topic-content p { margin-bottom: 10px; }
+}
+
+/* === EXAM CARD === */
+@media (max-width: 650px) {
+  #examWrap, .exam-card { padding: 18px 16px; border-radius: 14px; margin: 16px 12px; }
+  .exam-card h3, #examWrap h3 { font-size: 18px; }
+  .exam-card p, #examWrap p { font-size: 13px; }
+  .exam-card .exam-btn, #examWrap .exam-btn, .take-exam-btn { width: 100%; padding: 13px; font-size: 14.5px; margin-top: 8px; }
+  .exam-card-inner { flex-direction: column; align-items: stretch; gap: 14px; }
+}
+
+/* === EXAM MODAL (when taking exam) === */
+@media (max-width: 650px) {
+  .exam-overlay .exam-modal { width: 95vw; max-width: 95vw; padding: 20px 16px;
+    max-height: 92vh; overflow-y: auto; }
+  .exam-modal h3 { font-size: 18px; }
+  .exam-question { padding: 14px; font-size: 14px; }
+  .exam-options { gap: 8px; }
+  .exam-option { padding: 11px 14px; font-size: 13.5px; min-height: 44px; }
+}
+
+/* === ADMIN PANEL — make it scroll horizontally on mobile === */
+@media (max-width: 650px) {
+  .admin-panel { padding: 14px; margin: 12px; border-radius: 12px; }
+  .admin-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+  .admin-stat .num { font-size: 22px; }
+  .admin-stat .lbl { font-size: 9.5px; }
+  .admin-users { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-user-row { font-size: 11.5px; gap: 8px; padding: 8px; min-width: 480px; }
+  .admin-user-row .em { font-size: 10.5px; }
+}
+
+/* === FOOTER === */
+@media (max-width: 650px) {
+  .footer-inner { flex-direction: column; gap: 18px; padding: 22px 16px; }
+  .footer-right { align-items: stretch; }
+  .footer-linkedin { justify-content: center; font-size: 13px; padding: 11px 18px; }
+  .footer-feedback { font-size: 12px; padding: 11px 14px; }
+}
+
+/* === TOUR — smaller caption on mobile === */
+@media (max-width: 650px) {
+  .itour-caption { max-width: calc(100vw - 24px); min-width: 0; left: 12px !important; right: 12px;
+    padding: 16px 18px; }
+  .itour-caption h4 { font-size: 18px; }
+  .itour-caption p { font-size: 13px; line-height: 1.5; }
+  .itour-step-num { font-size: 9px; letter-spacing: 2px; }
+  .itour-btn { padding: 7px 11px; font-size: 11.5px; letter-spacing: 0.3px; }
+  .itour-foot { flex-wrap: wrap; gap: 6px; }
+  .itour-cursor { width: 22px; height: 22px; }
+}
+
+/* === ACHIEVEMENT TOASTS — bottom-anchored on mobile === */
+@media (max-width: 650px) {
+  .achv-toast-stack { top: auto; bottom: 80px; right: 10px; left: 10px; }
+  .achv-toast { padding: 12px 16px; min-width: 0; }
+  .achv-text-h { font-size: 16px; }
+  .achv-text-s { font-size: 12px; }
+  .achv-icon { font-size: 26px; }
+}
+
+/* === TOAST notifications === */
+@media (max-width: 650px) {
+  .toast { font-size: 13px; padding: 11px 16px; bottom: 80px; left: 12px; right: 12px;
+    max-width: none; text-align: center; }
+}
+
+/* === GENERAL CONTAINER PADDING === */
+@media (max-width: 650px) {
+  .container, .wrap, .main-content { padding-left: 0; padding-right: 0; }
+  main { padding: 0; }
+}
+
+/* === SCROLLBARS are subtle on mobile === */
+@media (max-width: 650px) {
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(212,165,55,0.35); border-radius: 2px; }
+}
+
+/* === SAFE AREA INSETS for iPhone notch / home indicator === */
+@supports (padding: max(0px)) {
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  .sound-toggle { bottom: max(12px, env(safe-area-inset-bottom)); left: max(12px, env(safe-area-inset-left)); }
+  .toast { bottom: max(70px, env(safe-area-inset-bottom)); }
+  .achv-toast-stack { bottom: max(70px, env(safe-area-inset-bottom)); }
+}
+
+
 </style>
 </head>
 <body>
@@ -6550,6 +6806,34 @@ window.addEventListener('error', e => console.error('[Error]', e.message, e.file
 /* ========== CINEMATIC INTRO SYSTEM ========== */
 const INTRO_LAST_SHOWN_KEY = 'jeet_atelier_intro_last_v1';
 let _introPlayed = false;
+
+
+
+/* === Device & browser detection === */
+const isMobileDevice = (() => {
+  const ua = navigator.userAgent || '';
+  const isTouchPrimary = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ||
+         (isTouchPrimary && window.innerWidth < 900);
+})();
+const isIOS = (() => {
+  const ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1);
+})();
+const isSafari = (() => {
+  const ua = navigator.userAgent || '';
+  return /Safari/i.test(ua) && !/Chrome|Chromium|Edg|OPR/i.test(ua);
+})();
+const isAndroid = /Android/i.test(navigator.userAgent || '');
+
+// Apply device-specific body classes for CSS hooks
+(function() {
+  if (isMobileDevice) document.documentElement.classList.add('is-mobile');
+  if (isIOS) document.documentElement.classList.add('is-ios');
+  if (isSafari) document.documentElement.classList.add('is-safari');
+  if (isAndroid) document.documentElement.classList.add('is-android');
+})();
+
 
 function shouldPlayIntro() {
   // Always play on every sign-in (user requested) — even after logout/login
