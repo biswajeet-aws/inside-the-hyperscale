@@ -4685,7 +4685,52 @@ function toggleTopic(courseId, topicId) {
   else cs.completedTopics.push(topicId);
   const today = new Date().toISOString().slice(0, 10);
   state.daily[today] = (state.daily[today] || 0) + 1;
-  saveState(); render();
+  saveState();
+  // BUG FIX: do NOT call full render() here — that wipes the DOM and the browser
+  // scrolls to the top before our scroll restoration can run, causing the page
+  // to jump. Instead, surgically update only the bits that change: the topic
+  // row's "done" class, the course's progress bar, the phase nav count, and the
+  // small daily counter on the hero.
+  surgicalTopicUpdate(courseId, topicId);
+}
+
+// Update only the affected UI bits without a full re-render — keeps scroll position.
+function surgicalTopicUpdate(courseId, topicId) {
+  const phase = STUDY_PLAN.phases.find(p => p.id === activePhaseId);
+  const course = phase && phase.courses.find(c => c.id === courseId);
+  if (!course) return;
+  const cs = getCourseState(courseId);
+  const tp = topicProgress(course);
+
+  // 1. Update the topic row's "done" class
+  const courseEl = document.querySelector(`.course[data-id="${courseId}"]`);
+  if (courseEl) {
+    const topicLabels = courseEl.querySelectorAll('.topic-item');
+    course.topics.forEach((t, idx) => {
+      const checked = cs.completedTopics.includes(t.id);
+      const label = topicLabels[idx];
+      if (label) {
+        label.classList.toggle('done', checked);
+        const cb = label.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = checked;
+      }
+    });
+
+    // 2. Update the course progress bar + count
+    const valEl = courseEl.querySelector('.bar-block .val');
+    if (valEl) valEl.textContent = `${tp.done} / ${tp.total} topics  (${tp.pct}%)`;
+    const barFill = courseEl.querySelector('.bar > div');
+    if (barFill) barFill.style.width = `${tp.pct}%`;
+    const titleCount = Array.from(courseEl.querySelectorAll('.section-title'))
+      .find(el => el.textContent.startsWith('Chapter Sections'));
+    if (titleCount) titleCount.textContent = `Chapter Sections (${tp.done}/${tp.total})`;
+  }
+
+  // 3. Update the phase nav count for the current phase
+  try { renderPhaseNav(); } catch (e) {}
+
+  // 4. Update the hero / daily counter
+  try { renderHero(); } catch (e) {}
 }
 
 /* === Phase lock logic (per-section: E1→E2... and M1→M2... are independent) === */
