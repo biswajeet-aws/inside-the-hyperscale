@@ -322,7 +322,7 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
   box-shadow: 0 0 0 4px rgba(212,165,55,0.7), 0 0 0 9999px rgba(5,13,9,0.78),
               0 0 40px rgba(212,165,55,0.4);
   pointer-events: none; z-index: 9001;
-  transition: all 0.6s cubic-bezier(.4,0,.2,1);
+  transition: all 0.35s cubic-bezier(.4,0,.2,1);
   background: transparent; }
 
 /* The caption card next to the spotlight */
@@ -331,7 +331,7 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
   color: #F5E8D3; border-radius: 16px;
   padding: 22px 26px; box-shadow: 0 16px 50px rgba(0,0,0,0.5);
   border: 1px solid rgba(212,165,55,0.4); z-index: 9002;
-  transition: all 0.5s cubic-bezier(.4,0,.2,1); }
+  transition: all 0.3s cubic-bezier(.4,0,.2,1); }
 .itour-caption .itour-step-num { font-size: 10px; font-weight: 700;
   letter-spacing: 3px; color: #D4A537; text-transform: uppercase;
   margin-bottom: 8px; }
@@ -366,8 +366,8 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
 /* Animated fake cursor that demonstrates clicks */
 .itour-cursor { position: fixed; width: 28px; height: 28px; z-index: 9003;
   pointer-events: none; opacity: 0;
-  transition: opacity 0.3s, left 1.0s cubic-bezier(.4,0,.2,1),
-              top 1.0s cubic-bezier(.4,0,.2,1); }
+  transition: opacity 0.3s, left 0.7s cubic-bezier(.4,0,.2,1),
+              top 0.7s cubic-bezier(.4,0,.2,1); }
 .itour-cursor.show { opacity: 1; }
 .itour-cursor svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 12px rgba(212,165,55,0.6)); }
 .itour-cursor.clicking::after { content: ''; position: absolute;
@@ -5309,6 +5309,7 @@ function renderSectionTabs() {
     const tab = el('button', {
       class: 'section-tab' + (id === activeSectionId ? ' active' : ''),
       onClick: () => {
+        try { playSound('switch'); } catch(e) {}
         activeSectionId = id;
         state.activeSection = id;
         const firstPhase = phasesInSection(id)[0];
@@ -5341,6 +5342,7 @@ function renderPhaseNav() {
           toast('🔒 Pass the previous phase exam to unlock this phase', 'warning');
           return;
         }
+        try { playSound('switch'); } catch(e) {}
         activePhaseId = p.id; state.activePhase = p.id; saveState();
         // Stay where the user was — render() will preserve scroll position.
         render();
@@ -6125,14 +6127,14 @@ const ITOUR_STEPS = [
     title: '👋 Welcome to Inside the Hyperscale',
     body: 'Let me give you a quick interactive tour — I will actually show you how to use everything. Sit back, watch, then dive in.',
     target: null,        // centered card
-    duration: 4500
+    duration: 3500
   },
   {
     key: 'sections',
     title: '🎯 Two parallel tracks',
     body: 'The course is split into <strong>Electrical</strong> (E1–E7) and <strong>Mechanical</strong> (M1–M8). You can study either or both in parallel.',
     target: '#sectionTabs',
-    duration: 4500,
+    duration: 4000,
     demo: { action: 'click-each-section' }
   },
   {
@@ -6140,21 +6142,21 @@ const ITOUR_STEPS = [
     title: '🔓 Phases unlock by passing exams',
     body: 'Each track has phases. Pass each phase\'s 10-question exam at <strong>60%</strong> to unlock the next. 🔒 means locked.',
     target: '#phaseNav',
-    duration: 5000
+    duration: 3500
   },
   {
     key: 'courses',
     title: '📚 Each phase has chapters',
     body: 'Inside every phase you will find chapter cards. Each chapter has a list of topic sections.',
     target: '#courseGrid > .course:first-child',
-    duration: 4500
+    duration: 3500
   },
   {
     key: 'expand',
     title: '▸ Tap the arrow to read',
     body: 'Click the <strong>▸ arrow</strong> next to any topic to expand the full study material — concepts, formulas, key takeaways.',
     target: '#courseGrid .topic-item:nth-child(1)',
-    duration: 5500,
+    duration: 4500,
     demo: { action: 'expand-topic' }
   },
   {
@@ -6162,7 +6164,7 @@ const ITOUR_STEPS = [
     title: '✓ Mark topics as read',
     body: 'Tap the checkbox to mark a topic done. Your progress saves automatically across all devices.',
     target: '#courseGrid .topic-item:nth-child(1)',
-    duration: 5000,
+    duration: 4000,
     demo: { action: 'tick-topic' }
   },
   {
@@ -6170,28 +6172,28 @@ const ITOUR_STEPS = [
     title: '📝 Take the phase exam',
     body: 'Scroll to the bottom of each phase and hit <strong>Take Exam</strong>. Pass 6 of 10 to unlock the next phase. Retake any time — no penalty.',
     target: '#examWrap',
-    duration: 5000
+    duration: 3500
   },
   {
     key: 'streak',
     title: '🔥 Build a daily streak',
     body: 'Come back daily — your streak counter grows. Hit milestones to unlock achievements.',
     target: '.welcome-banner .welcome-streak',
-    duration: 4000
+    duration: 3000
   },
   {
     key: 'feedback',
     title: '💬 Found a mistake? Tell me.',
     body: 'I am human and can make mistakes. Spot an error? Take a screenshot and DM me on LinkedIn — the link is in the footer.',
     target: 'footer',
-    duration: 4500
+    duration: 3500
   },
   {
     key: 'end',
     title: '🚀 You are ready.',
     body: 'That is the whole tour. Click <strong>Start learning</strong> below — or hit <em>How to use</em> in the header any time to replay this.',
     target: null,
-    duration: 5000
+    duration: 4000
   }
 ];
 
@@ -6265,7 +6267,7 @@ function runItourStep(step, idx) {
         spot.style.top = (r.top - pad) + 'px';
         spot.style.width = (r.width + pad * 2) + 'px';
         spot.style.height = (r.height + pad * 2) + 'px';
-      }, 350);
+      }, 180);
     } else {
       spot.style.display = 'none';
     }
@@ -6288,35 +6290,40 @@ function runItourStep(step, idx) {
       </div>
     `;
 
-    // Smart position caption (avoid covering target)
+    // Smart position caption — ALWAYS clamp into the visible viewport
     setTimeout(() => {
       if (targetEl) {
         const r = targetEl.getBoundingClientRect();
         const capRect = cap.getBoundingClientRect();
-        const margin = 24;
-        // Try below first
+        const margin = 20;
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const maxTop = vh - capRect.height - margin;
+        const maxLeft = vw - capRect.width - margin;
+        // Try below the target first
         let top = r.bottom + margin;
-        if (top + capRect.height > window.innerHeight - 20) {
-          // Try above
+        // If below would go off-screen, try above
+        if (top > maxTop) {
           top = r.top - capRect.height - margin;
-          if (top < 20) {
-            // Default to right side
-            top = Math.max(20, Math.min(window.innerHeight - capRect.height - 20, r.top));
+          if (top < margin) {
+            // Doesn't fit above either — place to the side, anchored to viewport
+            top = Math.max(margin, Math.min(maxTop, vh / 2 - capRect.height / 2));
           }
         }
+        // Always horizontally clamp into viewport
         let left = r.left + r.width / 2 - capRect.width / 2;
-        left = Math.max(16, Math.min(window.innerWidth - capRect.width - 16, left));
+        left = Math.max(margin, Math.min(maxLeft, left));
+        // Hard clamp into viewport edges (final safety)
+        top = Math.max(margin, Math.min(maxTop, top));
         cap.style.top = top + 'px';
         cap.style.left = left + 'px';
+        cap.style.transform = 'none';
       } else {
         // Center caption when no target
         cap.style.top = '50%';
         cap.style.left = '50%';
         cap.style.transform = 'translate(-50%, -50%)';
-        return;
       }
-      cap.style.transform = 'none';
-    }, 400);
+    }, 250);
 
     // Bind controls
     const skip = document.getElementById('itourSkipBtn');
@@ -6339,12 +6346,12 @@ function runItourStep(step, idx) {
       }
     }, 50);
 
-    // Run the demo action if any (after 600ms delay so spotlight is settled)
+    // Run the demo action if any (after spotlight settles)
     let demoStarted = false;
     if (step.demo) {
       setTimeout(() => {
         if (!_itourStop) { demoStarted = true; runItourDemo(step.demo); }
-      }, 800);
+      }, 450);
     }
 
     // Auto-advance after duration
@@ -6389,12 +6396,12 @@ async function moveCursorToAndClick(el) {
   cur.classList.add('show');
   cur.style.left = tx + 'px';
   cur.style.top = ty + 'px';
-  await wait(1050);
+  await wait(750);
   cur.classList.add('clicking');
   try { el.click(); } catch (e) {}
-  await wait(700);
+  await wait(500);
   cur.classList.remove('clicking');
-  await wait(300);
+  await wait(200);
 }
 
 // Backwards-compatible name — startGuidedTour now delegates to the interactive tour
@@ -6521,6 +6528,21 @@ if (document.readyState === 'loading') {
 } else {
   boot(); try { startLoginAnimation(); } catch(e) {}
 }
+// Resume audio context on ANY first user interaction (browsers require user gesture)
+(function() {
+  const unlock = async () => {
+    try {
+      const ctx = getAudio();
+      if (ctx && ctx.state === 'suspended') await ctx.resume();
+    } catch (e) {}
+    document.removeEventListener('click', unlock, true);
+    document.removeEventListener('touchstart', unlock, true);
+    document.removeEventListener('keydown', unlock, true);
+  };
+  document.addEventListener('click', unlock, true);
+  document.addEventListener('touchstart', unlock, true);
+  document.addEventListener('keydown', unlock, true);
+})();
 
 window.addEventListener('error', e => console.error('[Error]', e.message, e.filename, e.lineno));
 
@@ -6963,7 +6985,8 @@ function fireConfettiBurst() {
 
 /* ========== SOUND SYSTEM (subtle, opt-in) ========== */
 const SOUND_KEY = 'jeet_atelier_sound_v1';
-let _soundOn = localStorage.getItem(SOUND_KEY) === '1';
+// Default ON — only OFF if user explicitly disables it
+let _soundOn = localStorage.getItem(SOUND_KEY) !== '0';
 let _audioCtx = null;
 
 function getAudio() {
@@ -6977,32 +7000,56 @@ function playSound(kind) {
   if (!_soundOn) return;
   const ctx = getAudio(); if (!ctx) return;
   const now = ctx.currentTime;
-  if (kind === 'tick') {
+  // All gains are intentionally LOW — these are haptic-style ambient cues,
+  // not music. Default ON but very subtle.
+  if (kind === 'tick' || kind === 'tap') {
+    // Soft "water drop" — descending pitch for a tactile feel
     const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.frequency.value = 900; o.type = 'sine';
-    g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(now + 0.08);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(740, now);
+    o.frequency.exponentialRampToValueAtTime(420, now + 0.09);
+    g.gain.setValueAtTime(0.025, now);
+    g.gain.exponentialRampToValueAtTime(0.0005, now + 0.12);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(now); o.stop(now + 0.13);
   } else if (kind === 'ting') {
+    // Light bell — three sine partials, very faint
     [800, 1200, 1600].forEach((f, i) => {
       const o = ctx.createOscillator(); const g = ctx.createGain();
       o.frequency.value = f; o.type = 'sine';
       const t0 = now + i * 0.04;
-      g.gain.setValueAtTime(0.06, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.6);
-      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + 0.6);
+      g.gain.setValueAtTime(0.022, t0);
+      g.gain.exponentialRampToValueAtTime(0.0005, t0 + 0.55);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + 0.55);
     });
   } else if (kind === 'chord') {
+    // Major triad — for achievement reveals
     [523.25, 659.25, 783.99].forEach(f => {
       const o = ctx.createOscillator(); const g = ctx.createGain();
       o.frequency.value = f; o.type = 'triangle';
-      g.gain.setValueAtTime(0.05, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + 0.8);
+      g.gain.setValueAtTime(0.022, now);
+      g.gain.exponentialRampToValueAtTime(0.0005, now + 0.7);
+      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + 0.7);
     });
   } else if (kind === 'whoosh') {
+    // Subtle low whoosh for transitions / intro
     const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.frequency.setValueAtTime(400, now); o.frequency.exponentialRampToValueAtTime(80, now + 0.3);
-    o.type = 'sawtooth';
-    g.gain.setValueAtTime(0.04, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-    o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + 0.3);
+    o.frequency.setValueAtTime(360, now);
+    o.frequency.exponentialRampToValueAtTime(70, now + 0.28);
+    o.type = 'sine';
+    g.gain.setValueAtTime(0.018, now);
+    g.gain.exponentialRampToValueAtTime(0.0005, now + 0.28);
+    o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + 0.28);
+  } else if (kind === 'switch') {
+    // Soft "swipe" for section/phase switches
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(500, now);
+    o.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+    g.gain.setValueAtTime(0.02, now);
+    g.gain.exponentialRampToValueAtTime(0.0005, now + 0.10);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(now); o.stop(now + 0.11);
   }
 }
 
