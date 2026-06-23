@@ -571,9 +571,138 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
   .phase-header .ph-meta { gap: 14px; width: 100%; justify-content: flex-start; }
   .logout-btn span { display: none; }
 }
+
+/* ========== CINEMATIC INTRO OVERLAY ========== */
+.intro-overlay { position: fixed; inset: 0; background: radial-gradient(ellipse at center, #0a1f17 0%, #050d09 70%); z-index: 99999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.9s cubic-bezier(.4,0,.2,1);
+  overflow: hidden; }
+.intro-overlay.fadeout { opacity: 0; pointer-events: none; }
+.intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-content { position: relative; z-index: 2; text-align: center; padding: 40px 20px; max-width: 1100px; }
+.intro-mark { width: 88px; height: 88px; margin: 0 auto 28px; background: linear-gradient(135deg, #D4A537 0%, #B8862B 100%);
+  border-radius: 22px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 700; color: #0a1f17;
+  box-shadow: 0 0 60px rgba(212,165,55,0.5), 0 0 120px rgba(212,165,55,0.25);
+  opacity: 0; transform: scale(0.3); animation: introMarkIn 0.9s 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes introMarkIn { to { opacity: 1; transform: scale(1); } }
+.intro-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 7vw, 78px); font-weight: 700;
+  color: #F5E8D3; letter-spacing: 1px; line-height: 1.1; margin-bottom: 18px; min-height: 1.2em; }
+.intro-title .ch { opacity: 0; display: inline-block; transform: translateY(20px); }
+.intro-title .ch.in { animation: introCharIn 0.5s cubic-bezier(.4,0,.2,1) forwards; }
+@keyframes introCharIn { to { opacity: 1; transform: translateY(0); } }
+.intro-tagline { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 2.5vw, 26px); color: #D4A537; font-style: italic;
+  opacity: 0; transform: translateY(10px); transition: all 0.8s 2.6s cubic-bezier(.4,0,.2,1); margin-bottom: 36px; }
+.intro-overlay.tagline-in .intro-tagline { opacity: 1; transform: translateY(0); }
+.intro-stats { display: flex; gap: 44px; justify-content: center; flex-wrap: wrap;
+  opacity: 0; transform: translateY(20px); transition: all 0.8s 3.4s cubic-bezier(.4,0,.2,1); }
+.intro-overlay.stats-in .intro-stats { opacity: 1; transform: translateY(0); }
+.intro-stat { text-align: center; }
+.intro-stat-num { font-family: 'Cormorant Garamond', serif; font-size: clamp(42px, 6vw, 64px); font-weight: 700;
+  color: #D4A537; line-height: 1; margin-bottom: 6px; }
+.intro-stat-lbl { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+  color: rgba(245,232,211,0.6); text-transform: uppercase; letter-spacing: 2.5px; }
+.intro-skip { position: absolute; top: 28px; right: 28px; background: rgba(245,232,211,0.08); color: #F5E8D3;
+  border: 1px solid rgba(212,165,55,0.3); border-radius: 24px; padding: 9px 18px; font-size: 12px;
+  font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.15s; z-index: 3;
+  opacity: 0; animation: introSkipIn 0.5s 1.2s forwards; font-family: 'Inter', sans-serif; }
+@keyframes introSkipIn { to { opacity: 0.9; } }
+.intro-skip:hover { background: rgba(212,165,55,0.2); border-color: #D4A537; opacity: 1; }
+
+/* ========== WELCOME BANNER (after intro) ========== */
+.welcome-banner { background: linear-gradient(135deg, rgba(212,165,55,0.08) 0%, rgba(47,125,91,0.05) 100%);
+  border: 1px solid rgba(212,165,55,0.25); border-radius: 16px; padding: 22px 26px; margin: 18px auto 28px;
+  max-width: 1200px; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  flex-wrap: wrap; animation: welcomeIn 0.7s 0.2s cubic-bezier(.34,1.56,.64,1) backwards; }
+@keyframes welcomeIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+.welcome-greeting { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; color: var(--primary-deep); }
+.welcome-greeting .name-highlight { background: linear-gradient(135deg, #D4A537, #B8862B);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.welcome-sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.welcome-streak { display: flex; align-items: center; gap: 10px; background: rgba(212,165,55,0.12);
+  border: 1px solid rgba(212,165,55,0.35); border-radius: 999px; padding: 10px 18px; }
+.welcome-streak .flame { font-size: 22px; animation: flicker 1.4s ease-in-out infinite; }
+@keyframes flicker { 0%,100% { transform: rotate(-3deg) scale(1); } 50% { transform: rotate(3deg) scale(1.08); } }
+.welcome-streak .streak-num { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: #B8862B; line-height: 1; }
+.welcome-streak .streak-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+
+/* ========== ACHIEVEMENT TOASTS ========== */
+.achv-toast-stack { position: fixed; top: 24px; right: 24px; z-index: 50000;
+  display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+.achv-toast { background: linear-gradient(135deg, #1B3A2F 0%, #0F4C3A 100%); color: #F5E8D3;
+  border: 1px solid rgba(212,165,55,0.4); border-radius: 14px; padding: 16px 22px;
+  display: flex; align-items: center; gap: 14px; box-shadow: 0 12px 40px rgba(15,76,58,0.35);
+  min-width: 280px; max-width: 380px; pointer-events: auto;
+  animation: achvIn 0.6s cubic-bezier(.34,1.56,.64,1), achvOut 0.5s 4.5s forwards; }
+@keyframes achvIn { from { opacity: 0; transform: translateX(120%) scale(0.7); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes achvOut { to { opacity: 0; transform: translateX(120%) scale(0.9); } }
+.achv-icon { font-size: 32px; flex-shrink: 0; }
+.achv-text-h { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #D4A537; margin-bottom: 2px; }
+.achv-text-s { font-size: 13px; opacity: 0.85; }
+
+/* ========== MICRO-ANIMATIONS ========== */
+.course { animation: cardFadeIn 0.5s cubic-bezier(.4,0,.2,1) backwards; }
+.course:nth-child(1) { animation-delay: 0.05s; }
+.course:nth-child(2) { animation-delay: 0.12s; }
+.course:nth-child(3) { animation-delay: 0.19s; }
+.course:nth-child(4) { animation-delay: 0.26s; }
+@keyframes cardFadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.topic-item.just-toggled { animation: topicPulse 0.6s ease-out; }
+@keyframes topicPulse { 0% { box-shadow: 0 0 0 0 rgba(47,125,91,0.6); } 100% { box-shadow: 0 0 0 14px rgba(47,125,91,0); } }
+.bar > div { transition: width 0.7s cubic-bezier(.4,0,.2,1) !important; }
+
+/* ========== CONFETTI ========== */
+.confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 40000; }
+
+/* ========== SOUND TOGGLE ========== */
+.sound-toggle { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px;
+  border-radius: 22px; background: white; box-shadow: var(--shadow-md);
+  border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; z-index: 1000; font-size: 18px; }
+.sound-toggle:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+/* ========== "CONTINUE HERE" PULSE ========== */
+.continue-pulse { position: relative; }
+.continue-pulse::before { content: ''; position: absolute; inset: -6px; border-radius: 14px;
+  border: 2px solid var(--accent); opacity: 0; animation: continueHalo 2s ease-out infinite; pointer-events: none; }
+@keyframes continueHalo { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.08); } }
+
+/* ========== HIDE INTRO BY DEFAULT (only shown by JS) ========== */
+.intro-overlay { display: none; }
+.intro-overlay.active { display: flex; }
+
+@media (max-width: 600px) {
+  .welcome-banner { padding: 16px 18px; }
+  .welcome-greeting { font-size: 22px; }
+  .intro-stats { gap: 28px; }
+  .achv-toast { min-width: 240px; }
+}
+
 </style>
 </head>
 <body>
+
+<!-- Cinematic Intro Overlay -->
+<div class="intro-overlay" id="introOverlay">
+  <canvas class="intro-canvas" id="introCanvas"></canvas>
+  <button type="button" class="intro-skip" id="introSkip">Skip intro →</button>
+  <div class="intro-content">
+    <div class="intro-mark">J</div>
+    <h1 class="intro-title" id="introTitle"></h1>
+    <p class="intro-tagline" id="introTagline">A free training atelier for the next generation of datacenter engineers</p>
+    <div class="intro-stats">
+      <div class="intro-stat"><div class="intro-stat-num" id="introStat1">0</div><div class="intro-stat-lbl">Phases</div></div>
+      <div class="intro-stat"><div class="intro-stat-num" id="introStat2">0</div><div class="intro-stat-lbl">Topics</div></div>
+      <div class="intro-stat"><div class="intro-stat-num" id="introStat3">0</div><div class="intro-stat-lbl">Questions</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Achievement toast stack -->
+<div class="achv-toast-stack" id="achvStack"></div>
+
+<!-- Sound toggle -->
+<button type="button" class="sound-toggle" id="soundToggle" title="Toggle sound" aria-label="Toggle sound">🔇</button>
+
 <!-- Login screen — Google sign-in (no password) -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
@@ -4714,6 +4843,10 @@ function toggleTopic(courseId, topicId) {
 
 // Update only the affected UI bits without a full re-render — keeps scroll position.
 function surgicalTopicUpdate(courseId, topicId) {
+  // Visual + sound feedback on toggle
+  try { playSound('tick'); } catch (e) {}
+  try { setTimeout(() => { try { checkAchievements(); } catch (e) {} }, 100); } catch (e) {}
+
   const phase = STUDY_PLAN.phases.find(p => p.id === activePhaseId);
   const course = phase && phase.courses.find(c => c.id === courseId);
   if (!course) return;
@@ -4728,7 +4861,12 @@ function surgicalTopicUpdate(courseId, topicId) {
       const checked = cs.completedTopics.includes(t.id);
       const label = topicLabels[idx];
       if (label) {
+        const wasChecked = label.classList.contains('done');
         label.classList.toggle('done', checked);
+        if (checked && !wasChecked) {
+          label.classList.add('just-toggled');
+          setTimeout(() => label.classList.remove('just-toggled'), 700);
+        }
         const cb = label.querySelector('input[type="checkbox"]');
         if (cb) cb.checked = checked;
       }
@@ -5219,6 +5357,17 @@ function showLogin() {
 function hideLogin() {
   document.body.classList.add('signed-in'); document.body.classList.remove('locked');
   document.getElementById('loginScreen').style.display = 'none';
+  // Trigger cinematic intro on first login of the day, then welcome banner
+  if (shouldPlayIntro()) {
+    playCinematicIntro().then(() => {
+      try { renderWelcomeBanner(currentUser); } catch (e) {}
+      try { checkAchievements(); } catch (e) {}
+    });
+  } else {
+    try { renderWelcomeBanner(currentUser); } catch (e) {}
+    try { checkAchievements(); } catch (e) {}
+  }
+  try { bindSoundToggle(); } catch (e) {}
 }
 
 /* === Google sign-in via Firebase Auth === */
@@ -5717,6 +5866,358 @@ if (document.readyState === 'loading') {
 }
 
 window.addEventListener('error', e => console.error('[Error]', e.message, e.filename, e.lineno));
+
+
+/* ========== CINEMATIC INTRO SYSTEM ========== */
+const INTRO_LAST_SHOWN_KEY = 'jeet_atelier_intro_last_v1';
+let _introPlayed = false;
+
+function shouldPlayIntro() {
+  const last = localStorage.getItem(INTRO_LAST_SHOWN_KEY);
+  if (!last) return true;
+  // Replay once every 8 hours for returning users
+  const lastMs = parseInt(last, 10);
+  return (Date.now() - lastMs) > (8 * 60 * 60 * 1000);
+}
+
+function playCinematicIntro() {
+  if (_introPlayed) return Promise.resolve();
+  _introPlayed = true;
+  localStorage.setItem(INTRO_LAST_SHOWN_KEY, String(Date.now()));
+
+  const overlay = document.getElementById('introOverlay');
+  if (!overlay) return Promise.resolve();
+  overlay.classList.add('active');
+  overlay.classList.remove('fadeout', 'tagline-in', 'stats-in');
+
+  // Start particle network
+  const canvas = document.getElementById('introCanvas');
+  const cleanup = startParticleNetwork(canvas);
+
+  // Typewriter the title
+  const titleEl = document.getElementById('introTitle');
+  const title = 'INSIDE THE HYPERSCALE';
+  titleEl.innerHTML = '';
+  title.split('').forEach((c, i) => {
+    const span = document.createElement('span');
+    span.className = 'ch';
+    span.textContent = c === ' ' ? '\u00A0' : c;
+    span.style.animationDelay = (1.0 + i * 0.05) + 's';
+    titleEl.appendChild(span);
+    setTimeout(() => span.classList.add('in'), 1000 + i * 50);
+  });
+
+  // Play optional sound (ting)
+  setTimeout(() => playSound('ting'), 2200);
+
+  // Show tagline at t=2.6s
+  setTimeout(() => overlay.classList.add('tagline-in'), 2400);
+
+  // Count up stats at t=3.4s
+  setTimeout(() => {
+    overlay.classList.add('stats-in');
+    countUp(document.getElementById('introStat1'), 15, 1200);
+    countUp(document.getElementById('introStat2'), 258, 1400);
+    countUp(document.getElementById('introStat3'), 150, 1300);
+  }, 3300);
+
+  // Skip handler
+  const skipBtn = document.getElementById('introSkip');
+  return new Promise(resolve => {
+    const finish = () => {
+      overlay.classList.add('fadeout');
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        cleanup();
+        resolve();
+      }, 900);
+    };
+    skipBtn.onclick = finish;
+    setTimeout(finish, 5200); // auto-finish after 5.2s
+  });
+}
+
+/* Particle Network Animation */
+function startParticleNetwork(canvas) {
+  const ctx = canvas.getContext('2d');
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let W = canvas.width = window.innerWidth * dpr;
+  let H = canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+
+  const N = Math.min(180, Math.floor((window.innerWidth * window.innerHeight) / 9000));
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4 * dpr,
+      vy: (Math.random() - 0.5) * 0.4 * dpr,
+      r: (Math.random() * 1.5 + 0.5) * dpr
+    });
+  }
+  let raf;
+  const linkDist = 130 * dpr;
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(212,165,55,0.85)';
+      ctx.fill();
+    }
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.hypot(dx, dy);
+        if (d < linkDist) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(212,165,55,${0.3 * (1 - d / linkDist)})`;
+          ctx.lineWidth = dpr;
+          ctx.stroke();
+        }
+      }
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  frame();
+  const onResize = () => {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.width = window.innerWidth * dpr;
+    H = canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+  };
+  window.addEventListener('resize', onResize);
+  return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); };
+}
+
+function countUp(el, target, dur) {
+  const start = performance.now();
+  const startVal = 0;
+  function step(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(startVal + (target - startVal) * eased);
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ========== WELCOME BANNER + STREAK ========== */
+function renderWelcomeBanner(user) {
+  // Remove existing
+  const existing = document.querySelector('.welcome-banner');
+  if (existing) existing.remove();
+  if (!user) return;
+  const firstName = (user.displayName || user.email || 'Engineer').split(' ')[0].split('@')[0];
+  const streak = computeStreak();
+  const banner = document.createElement('div');
+  banner.className = 'welcome-banner';
+  banner.innerHTML = `
+    <div>
+      <div class="welcome-greeting">Welcome back, <span class="name-highlight">${escapeHtml(firstName)}</span></div>
+      <div class="welcome-sub">Pick up where you left off — your hyperscale journey continues.</div>
+    </div>
+    <div class="welcome-streak">
+      <span class="flame">🔥</span>
+      <div>
+        <div class="streak-num">${streak}</div>
+        <div class="streak-lbl">Day streak</div>
+      </div>
+    </div>`;
+  // Insert at top of app, after the hero or before phase nav
+  const hero = document.getElementById('heroCard') || document.getElementById('phaseNav');
+  if (hero && hero.parentNode) {
+    hero.parentNode.insertBefore(banner, hero);
+  }
+}
+
+function computeStreak() {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const days = state.daily || {};
+  const dates = Object.keys(days).sort().reverse();
+  if (!dates.length) return 1;
+  let streak = 0;
+  const cursor = new Date();
+  for (let i = 0; i < 365; i++) {
+    const k = cursor.toISOString().slice(0, 10);
+    if (days[k] && days[k] > 0) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else if (i === 0) {
+      // Today empty — count from yesterday
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return Math.max(1, streak);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ========== ACHIEVEMENTS ========== */
+const ACHIEVEMENTS = [
+  { id: 'first_topic',     icon: '📚', h: 'First topic complete!',  s: 'Your hyperscale journey begins.', check: () => totalTopicsDone() >= 1 },
+  { id: 'five_topics',     icon: '🎯', h: '5 topics down',          s: 'You\'re building momentum.', check: () => totalTopicsDone() >= 5 },
+  { id: 'twenty_topics',   icon: '🚀', h: '20 topics — flying!',     s: 'You\'re moving fast.', check: () => totalTopicsDone() >= 20 },
+  { id: 'phase_1_complete',icon: '🏆', h: 'Phase complete!',         s: 'Onwards to the next phase.', check: () => Object.keys(state.examsPassed || {}).length >= 1 },
+  { id: 'halfway',         icon: '⚡', h: 'Halfway there',           s: '50% of all topics — incredible.', check: () => totalTopicsDone() >= 129 },
+  { id: 'three_day_streak',icon: '🔥', h: '3-day streak',            s: 'Consistency wins.', check: () => computeStreak() >= 3 },
+  { id: 'week_streak',     icon: '👑', h: '7-day streak!',           s: 'You\'re building a habit.', check: () => computeStreak() >= 7 },
+];
+
+function totalTopicsDone() {
+  let total = 0;
+  for (const cid in (state.courses || {})) {
+    total += (state.courses[cid].completedTopics || []).length;
+  }
+  return total;
+}
+
+function checkAchievements() {
+  const unlocked = state.achievements = state.achievements || {};
+  let newOnes = [];
+  for (const a of ACHIEVEMENTS) {
+    if (!unlocked[a.id] && a.check()) {
+      unlocked[a.id] = Date.now();
+      newOnes.push(a);
+    }
+  }
+  if (newOnes.length) {
+    saveState();
+    newOnes.forEach((a, i) => setTimeout(() => showAchievementToast(a), i * 800));
+  }
+}
+
+function showAchievementToast(a) {
+  const stack = document.getElementById('achvStack');
+  if (!stack) return;
+  const toast = document.createElement('div');
+  toast.className = 'achv-toast';
+  toast.innerHTML = `<div class="achv-icon">${a.icon}</div><div><div class="achv-text-h">${escapeHtml(a.h)}</div><div class="achv-text-s">${escapeHtml(a.s)}</div></div>`;
+  stack.appendChild(toast);
+  playSound('chord');
+  fireConfettiBurst();
+  setTimeout(() => toast.remove(), 5200);
+}
+
+/* ========== CONFETTI ========== */
+function fireConfettiBurst() {
+  const c = document.createElement('canvas');
+  c.className = 'confetti-canvas';
+  document.body.appendChild(c);
+  const ctx = c.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = window.innerWidth * dpr;
+  c.height = window.innerHeight * dpr;
+  c.style.width = window.innerWidth + 'px';
+  c.style.height = window.innerHeight + 'px';
+  const colors = ['#D4A537', '#2F7D5B', '#F5E8D3', '#B8862B', '#1B3A2F'];
+  const parts = [];
+  for (let i = 0; i < 80; i++) {
+    parts.push({
+      x: c.width / 2, y: c.height / 3,
+      vx: (Math.random() - 0.5) * 18 * dpr,
+      vy: (Math.random() * -16 - 6) * dpr,
+      g: 0.6 * dpr,
+      size: (Math.random() * 6 + 3) * dpr,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.3,
+      life: 1
+    });
+  }
+  let frames = 0;
+  function step() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += p.g;
+      p.rot += p.vrot; p.life -= 0.008;
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+    frames++;
+    if (frames < 180) requestAnimationFrame(step);
+    else c.remove();
+  }
+  step();
+}
+
+/* ========== SOUND SYSTEM (subtle, opt-in) ========== */
+const SOUND_KEY = 'jeet_atelier_sound_v1';
+let _soundOn = localStorage.getItem(SOUND_KEY) === '1';
+let _audioCtx = null;
+
+function getAudio() {
+  if (!_audioCtx) {
+    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  }
+  return _audioCtx;
+}
+
+function playSound(kind) {
+  if (!_soundOn) return;
+  const ctx = getAudio(); if (!ctx) return;
+  const now = ctx.currentTime;
+  if (kind === 'tick') {
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.frequency.value = 900; o.type = 'sine';
+    g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(now + 0.08);
+  } else if (kind === 'ting') {
+    [800, 1200, 1600].forEach((f, i) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.frequency.value = f; o.type = 'sine';
+      const t0 = now + i * 0.04;
+      g.gain.setValueAtTime(0.06, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.6);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + 0.6);
+    });
+  } else if (kind === 'chord') {
+    [523.25, 659.25, 783.99].forEach(f => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.frequency.value = f; o.type = 'triangle';
+      g.gain.setValueAtTime(0.05, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + 0.8);
+    });
+  } else if (kind === 'whoosh') {
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.frequency.setValueAtTime(400, now); o.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+    o.type = 'sawtooth';
+    g.gain.setValueAtTime(0.04, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + 0.3);
+  }
+}
+
+function updateSoundToggleUI() {
+  const btn = document.getElementById('soundToggle');
+  if (btn) btn.textContent = _soundOn ? '🔊' : '🔇';
+}
+
+function bindSoundToggle() {
+  const btn = document.getElementById('soundToggle');
+  if (!btn) return;
+  updateSoundToggleUI();
+  btn.onclick = () => {
+    _soundOn = !_soundOn;
+    localStorage.setItem(SOUND_KEY, _soundOn ? '1' : '0');
+    updateSoundToggleUI();
+    if (_soundOn) playSound('ting');
+  };
+}
 
 </script>
 </body>
