@@ -4741,7 +4741,9 @@ function renderSectionTabs() {
         state.activeSection = id;
         const firstPhase = phasesInSection(id)[0];
         if (firstPhase) { activePhaseId = firstPhase.id; state.activePhase = firstPhase.id; }
-        saveState(); render();
+        saveState();
+        _skipScrollRestore = true;  // intentional jump — switching section
+        render();
         window.scrollTo({top:0,behavior:'smooth'});
       }
     }, [
@@ -4768,7 +4770,9 @@ function renderPhaseNav() {
           toast('🔒 Pass the previous phase exam to unlock this phase', 'warning');
           return;
         }
-        activePhaseId = p.id; state.activePhase = p.id; saveState(); render();
+        activePhaseId = p.id; state.activePhase = p.id; saveState();
+        _skipScrollRestore = true;  // intentional jump — switching phase
+        render();
         window.scrollTo({top:0,behavior:'smooth'});
       }
     }, [
@@ -5068,13 +5072,28 @@ function calcStreak() {
   return streak;
 }
 
+// When true, the next render() call will NOT preserve scroll (used for
+// intentional navigation like switching phases/sections — caller scrolls to top).
+let _skipScrollRestore = false;
 function render() {
+  // BUG FIX: preserve scroll position across re-renders.
+  // Without this, ticking a topic checkbox or any action that calls render()
+  // wipes the DOM and the browser resets scrollY to 0, jumping the user to
+  // the top of the page. Now we snapshot scrollY and restore it after rebuild.
+  const savedScrollY = window.scrollY || window.pageYOffset || 0;
   renderSectionTabs();
   renderPhaseNav();
   renderPhaseHeader();
   renderCourses();
   renderHero();
   renderExamCard();
+  if (_skipScrollRestore) {
+    _skipScrollRestore = false;
+    // Caller will set their own scroll target (e.g. window.scrollTo top).
+  } else {
+    // Restore on next frame so the layout is settled.
+    requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
+  }
 }
 
 /* === Firebase Auth + Firestore Sync + Heartbeat Time Tracking === */
