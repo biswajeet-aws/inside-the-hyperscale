@@ -106,47 +106,136 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* === LOGIN === */
-.login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary) 100%);
-  display: flex; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
-.login-screen::before { content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at 70% 30%, rgba(212,162,76,0.18), transparent 60%),
-              radial-gradient(circle at 30% 70%, rgba(212,162,76,0.12), transparent 60%); pointer-events: none; }
-.login-card { background: var(--bg); border-radius: var(--radius); max-width: 460px; width: 100%;
-  padding: 40px 36px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); position: relative; border: 1px solid var(--line); }
-.login-card .login-mark { width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--primary-deep));
-  color: var(--gold); border-radius: 13px; display: grid; place-items: center;
-  font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 32px; margin: 0 auto 20px; box-shadow: var(--shadow-md); }
-.login-card h2 { font-size: 28px; color: var(--primary-deep); text-align: center; margin-bottom: 6px; }
-.login-card .login-sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 26px; }
-.login-card .login-sub strong { color: var(--gold-deep); font-weight: 600; }
-.login-form { display: flex; flex-direction: column; gap: 14px; }
-.login-form .field-row { display: flex; flex-direction: column; gap: 6px; }
-.login-form label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
-.login-form input { padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm);
-  font-family: inherit; font-size: 16px; color: var(--ink); transition: border-color 0.15s ease; }
-.login-form input:focus { outline: none; border-color: var(--primary); }
-.login-error { font-size: 13px; color: var(--danger); background: rgba(177,74,58,0.08);
-  border: 1px solid rgba(177,74,58,0.25); border-radius: var(--radius-sm); padding: 10px 14px; display: none; }
-.login-error.show { display: block; }
-.login-btn { margin-top: 6px; padding: 14px 20px; background: var(--primary); color: #fff;
-  border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; transition: all 0.15s ease; }
-.login-btn:hover { background: var(--primary-deep); transform: translateY(-1px); }
-.login-footnote { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: 24px;
-  border-top: 1px solid var(--line); padding-top: 16px; line-height: 1.55; }
-.login-trust { font-size: 11.5px; color: var(--primary-deep); text-align: center; margin-top: 14px;
-  padding: 10px 12px; background: rgba(212,165,55,0.08); border-radius: 8px;
-  border: 1px solid rgba(212,165,55,0.25); line-height: 1.5; font-weight: 500; }
-.google-signin-btn { display: flex; align-items: center; justify-content: center; gap: 12px;
-  width: 100%; padding: 14px 20px; background: #fff; color: #1f1f1f;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  font-size: 15.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+/* === LOGIN — cinematic hero === */
+.login-screen { position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, #1a4a35 0%, #0a1f17 60%, #050d09 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5000; padding: 24px; overflow: hidden; }
+.loginbg-aurora, .loginbg-particles { position: absolute; inset: 0;
+  width: 100%; height: 100%; pointer-events: none; }
+.loginbg-aurora { z-index: 0; opacity: 0.55; }
+.loginbg-particles { z-index: 1; }
+.loginbg-vignette { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(5,13,9,0.7) 100%); }
+
+.login-shell { position: relative; z-index: 5;
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  gap: 60px; align-items: center;
+  max-width: 1240px; width: 100%; padding: 20px; }
+
+/* LEFT — pitch */
+.login-pitch { color: #F5E8D3; animation: pitchIn 1s cubic-bezier(.4,0,.2,1); }
+@keyframes pitchIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+.login-pretitle { display: inline-flex; align-items: center; gap: 10px;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 4px; color: #D4A537; margin-bottom: 24px;
+  padding: 8px 16px; background: rgba(212,165,55,0.1);
+  border: 1px solid rgba(212,165,55,0.3); border-radius: 999px; }
+.login-pretitle .dot { width: 6px; height: 6px; border-radius: 50%;
+  background: #D4A537; box-shadow: 0 0 12px #D4A537;
+  animation: dotPulse 1.6s ease-in-out infinite; }
+@keyframes dotPulse { 50% { opacity: 0.4; } }
+
+.login-bigtitle { font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(38px, 5.2vw, 64px); font-weight: 700; line-height: 1.05;
+  color: #F5E8D3; margin-bottom: 24px; letter-spacing: -0.5px;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.4); }
+.login-bigtitle em { font-style: italic; color: #D4A537; }
+.login-bigtitle .goldwash { background: linear-gradient(135deg, #D4A537 0%, #F5E8D3 60%, #D4A537 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; background-size: 200% auto;
+  animation: goldwashSweep 4s ease-in-out infinite; }
+@keyframes goldwashSweep { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+.login-bigsub { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7;
+  color: rgba(245,232,211,0.78); max-width: 540px; margin-bottom: 28px; }
+.login-bigsub strong { color: #D4A537; font-weight: 700; }
+
+.login-stats-bar { display: flex; gap: 0; margin-bottom: 28px;
+  background: rgba(245,232,211,0.04); border: 1px solid rgba(212,165,55,0.18);
+  border-radius: 14px; padding: 18px 8px; max-width: 540px; }
+.login-stat { flex: 1; text-align: center; position: relative; padding: 0 12px; }
+.login-stat + .login-stat::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 1px; background: rgba(212,165,55,0.2); }
+.ls-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700;
+  color: #D4A537; line-height: 1; margin-bottom: 4px; }
+.ls-lbl { font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(245,232,211,0.55); }
+
+.login-teasers { display: flex; flex-wrap: wrap; gap: 10px; max-width: 540px; }
+.teaser { display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: rgba(245,232,211,0.05);
+  border: 1px solid rgba(245,232,211,0.1); border-radius: 999px;
+  font-size: 12.5px; color: rgba(245,232,211,0.85);
+  transition: all 0.25s; cursor: default; backdrop-filter: blur(4px); }
+.teaser:hover { background: rgba(212,165,55,0.12); border-color: rgba(212,165,55,0.4);
+  transform: translateY(-2px); }
+
+/* RIGHT — glass sign-in card */
+.login-card { background: rgba(245,232,211,0.95); backdrop-filter: blur(20px);
+  border-radius: 22px; max-width: 440px; width: 100%; padding: 44px 38px;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5), 0 0 80px rgba(212,165,55,0.12);
+  position: relative; border: 1px solid rgba(245,232,211,0.5);
+  animation: cardIn 1s 0.2s cubic-bezier(.34,1.4,.64,1) backwards; }
+@keyframes cardIn { from { opacity: 0; transform: translateX(30px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
+.login-card .login-mark { width: 62px; height: 62px;
+  background: linear-gradient(135deg, #1B3A2F 0%, #0F4C3A 100%);
+  color: #D4A537; border-radius: 16px; display: grid; place-items: center;
+  font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 36px;
+  margin: 0 auto 22px; box-shadow: 0 8px 24px rgba(15,76,58,0.3); }
+.login-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 34px;
+  font-weight: 700; color: #1B3A2F; text-align: center; margin-bottom: 8px;
+  letter-spacing: -0.5px; }
+.login-card .login-sub { text-align: center; color: rgba(27,58,47,0.7);
+  font-size: 14px; line-height: 1.55; margin-bottom: 26px; }
+.login-card .login-sub strong { color: #D4A537; font-weight: 700; }
+
+.google-signin-btn { display: flex; align-items: center; justify-content: center;
+  gap: 12px; width: 100%; padding: 16px 22px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
+  color: #1f1f1f; border: 1px solid rgba(27,58,47,0.15); border-radius: 12px;
+  font-size: 15.5px; font-weight: 600; cursor: pointer;
+  transition: all 0.25s cubic-bezier(.4,0,.2,1); position: relative; overflow: hidden;
+  box-shadow: 0 4px 14px rgba(27,58,47,0.12);
   font-family: 'Inter', -apple-system, sans-serif; }
-.google-signin-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.12); border-color: var(--primary-soft); transform: translateY(-1px); }
-.google-signin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.login-status { display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 14px; color: var(--ink-soft); font-size: 14px; }
+.google-signin-btn:hover { box-shadow: 0 8px 24px rgba(27,58,47,0.18);
+  border-color: rgba(212,165,55,0.5); transform: translateY(-2px); }
+.google-signin-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-shine { position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212,165,55,0.4), transparent);
+  transition: left 0.6s cubic-bezier(.4,0,.2,1); }
+.google-signin-btn:hover .btn-shine { left: 100%; }
+
+.login-error { font-size: 13px; color: #B14A3A; background: rgba(177,74,58,0.08);
+  border: 1px solid rgba(177,74,58,0.25); border-radius: 8px;
+  padding: 10px 14px; margin-top: 12px; display: none; }
+.login-error.show { display: block; }
+.login-status { display: flex; align-items: center; justify-content: center;
+  gap: 12px; padding: 14px; color: rgba(27,58,47,0.7); font-size: 14px; }
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(27,58,47,0.2);
+  border-top-color: #1B3A2F; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.login-trust { font-size: 11.5px; color: #1B3A2F; text-align: center; margin-top: 18px;
+  padding: 12px 14px; background: rgba(212,165,55,0.12); border-radius: 10px;
+  border: 1px solid rgba(212,165,55,0.3); line-height: 1.55; font-weight: 500; }
+.login-footnote { font-size: 11.5px; color: rgba(27,58,47,0.55); text-align: center;
+  margin-top: 18px; line-height: 1.55; }
+.login-form { display: flex; flex-direction: column; gap: 14px; }
+.login-btn { padding: 14px 20px; background: #1B3A2F; color: #fff;
+  border-radius: 10px; font-size: 15px; font-weight: 600; transition: all 0.15s ease; }
+
+@media (max-width: 900px) {
+  .login-shell { grid-template-columns: 1fr; gap: 28px; }
+  .login-pitch { text-align: center; }
+  .login-pretitle { margin-left: auto; margin-right: auto; }
+  .login-stats-bar, .login-teasers, .login-bigsub { margin-left: auto; margin-right: auto; }
+  .login-teasers { justify-content: center; }
+  .login-card { margin: 0 auto; }
+}
+
+
 .spinner { width: 20px; height: 20px; border: 2.5px solid var(--line);
   border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -829,27 +918,64 @@ body:not(.signed-in) .main, body:not(.signed-in) .footer { visibility: hidden; }
 
 <!-- Login screen — Google sign-in (no password) -->
 <div class="login-screen" id="loginScreen">
-  <div class="login-card">
-    <div class="login-mark">J</div>
-    <h2>Welcome — Inside the Hyperscale</h2>
-    <p class="login-sub">A free training atelier for new datacenter engineers. <strong>Curated by JEET.</strong></p>
-    <button type="button" class="google-signin-btn" id="btnGoogleSignin">
-      <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-      </svg>
-      <span>Sign in with Google</span>
-    </button>
-    <div class="login-error" id="loginErr"></div>
-    <div class="login-status" id="loginStatus" style="display:none;">
-      <div class="spinner"></div>
-      <span>Signing you in...</span>
+  <!-- Cinematic background layers (canvas-based particle network + aurora) -->
+  <canvas class="loginbg-aurora" id="loginAurora"></canvas>
+  <canvas class="loginbg-particles" id="loginParticles"></canvas>
+  <div class="loginbg-vignette"></div>
+
+  <div class="login-shell">
+    <!-- LEFT: the pitch -->
+    <div class="login-pitch">
+      <div class="login-pretitle"><span class="dot"></span> A MASTERCLASS · FREE FOREVER</div>
+      <h1 class="login-bigtitle">
+        Everything they <em>don't</em><br>
+        teach you about<br>
+        <span class="goldwash">modern datacenters.</span>
+      </h1>
+      <p class="login-bigsub">
+        15 phases. 258 topics. 150 exam questions.
+        The complete electrical &amp; mechanical playbook —
+        built by an engineer who actually does it. <strong>Free, forever.</strong>
+      </p>
+      <div class="login-stats-bar">
+        <div class="login-stat"><div class="ls-num" data-target="15">0</div><div class="ls-lbl">Phases</div></div>
+        <div class="login-stat"><div class="ls-num" data-target="258">0</div><div class="ls-lbl">Topics</div></div>
+        <div class="login-stat"><div class="ls-num" data-target="150">0</div><div class="ls-lbl">Questions</div></div>
+        <div class="login-stat"><div class="ls-num" data-target="30">0</div><div class="ls-lbl">Videos</div></div>
+      </div>
+      <div class="login-teasers">
+        <div class="teaser">⚡ <span>Power: from grid to busbar</span></div>
+        <div class="teaser">❄️ <span>Cooling: air, water, immersion</span></div>
+        <div class="teaser">🛡️ <span>Resilience: Tier I → Tier IV</span></div>
+        <div class="teaser">🌿 <span>Sustainability: PUE → net-zero</span></div>
+      </div>
     </div>
-    <p class="login-footnote">No password. One click. Your study progress syncs across all your devices automatically.<br>You sign in with the same Google account on phone or laptop → same progress.</p>
-    <p class="login-trust">🛡️ Secure Google sign-in — I never see your password. Only your name and email are used, only to save your progress. Never shared, never sold, no spam.</p>
+
+    <!-- RIGHT: the sign-in card -->
+    <div class="login-card">
+      <div class="login-mark">J</div>
+      <h2>Step inside.</h2>
+      <p class="login-sub">One click. No password. Your study progress syncs across all your devices. <strong>Curated by JEET.</strong></p>
+      <button type="button" class="google-signin-btn" id="btnGoogleSignin">
+        <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span>Continue with Google</span>
+        <span class="btn-shine"></span>
+      </button>
+      <div class="login-error" id="loginErr"></div>
+      <div class="login-status" id="loginStatus" style="display:none;">
+        <div class="spinner"></div>
+        <span>Signing you in...</span>
+      </div>
+      <p class="login-trust">🛡️ Secure Google sign-in — I never see your password. Only your name and email are used to save your progress. Never shared, never sold, no spam.
+      </p>
+    </div>
   </div>
+</div>
 </div>
 
 <svg width="0" height="0" style="position:absolute;">
@@ -5477,10 +5603,99 @@ function getAuth() {
 function showLogin() {
   document.body.classList.remove('signed-in'); document.body.classList.add('locked');
   document.getElementById('loginScreen').style.display = 'flex';
+  // Start animated background + stat count-up on login screen
+  try { startLoginAnimation(); } catch (e) { console.warn('login anim', e); }
+}
+
+let _loginAnimRunning = false, _loginAnimCleanup = null;
+function startLoginAnimation() {
+  if (_loginAnimRunning) return;
+  _loginAnimRunning = true;
+  // Particle network background (continuous, slower than intro)
+  const particlesCanvas = document.getElementById('loginParticles');
+  const auroraCanvas = document.getElementById('loginAurora');
+  if (particlesCanvas) _loginAnimCleanup = runLoginParticles(particlesCanvas, auroraCanvas);
+  // Count up the four stats with stagger
+  document.querySelectorAll('.ls-num').forEach((el, i) => {
+    const target = parseInt(el.dataset.target || '0', 10);
+    setTimeout(() => countUp(el, target, 1400), 400 + i * 180);
+  });
+}
+function stopLoginAnimation() {
+  if (_loginAnimCleanup) { _loginAnimCleanup(); _loginAnimCleanup = null; }
+  _loginAnimRunning = false;
+}
+
+function runLoginParticles(canvas, aurora) {
+  const ctx = canvas.getContext('2d');
+  const actx = aurora ? aurora.getContext('2d') : null;
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function size(c) { if(!c) return; c.width = window.innerWidth*dpr; c.height = window.innerHeight*dpr;
+    c.style.width = window.innerWidth+'px'; c.style.height = window.innerHeight+'px'; }
+  size(canvas); size(aurora);
+  let W = canvas.width, H = canvas.height;
+  const N = Math.min(140, Math.floor((window.innerWidth*window.innerHeight)/12000));
+  const parts = [];
+  for (let i=0; i<N; i++) parts.push({
+    x: Math.random()*W, y: Math.random()*H,
+    vx: (Math.random()-0.5)*0.22*dpr, vy: (Math.random()-0.5)*0.22*dpr,
+    r: (Math.random()*1.4+0.5)*dpr
+  });
+  let raf, auroraT = 0;
+  const linkDist = 140*dpr;
+  function frame() {
+    auroraT += 0.004;
+    if (actx) {
+      actx.clearRect(0,0,W,H);
+      for (let i=0; i<2; i++) {
+        const g = actx.createRadialGradient(
+          W*(0.3+0.4*Math.sin(auroraT+i*2)),
+          H*(0.4+0.3*Math.cos(auroraT*0.7+i*1.3)),
+          50*dpr,
+          W*(0.5+0.2*Math.sin(auroraT+i)),
+          H*(0.5+0.2*Math.cos(auroraT+i)),
+          Math.max(W,H)*0.6);
+        const c = i%2===0 ? '212,165,55' : '47,125,91';
+        g.addColorStop(0, `rgba(${c},0.22)`);
+        g.addColorStop(1, `rgba(${c},0)`);
+        actx.fillStyle = g; actx.fillRect(0,0,W,H);
+      }
+    }
+    ctx.clearRect(0,0,W,H);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x<0||p.x>W) p.vx*=-1;
+      if (p.y<0||p.y>H) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(212,165,55,0.7)';
+      ctx.fill();
+    }
+    ctx.lineWidth = dpr;
+    for (let i=0; i<N; i++) {
+      for (let j=i+1; j<N; j++) {
+        const dx = parts[i].x-parts[j].x, dy = parts[i].y-parts[j].y;
+        const d = Math.hypot(dx, dy);
+        if (d < linkDist) {
+          ctx.beginPath();
+          ctx.moveTo(parts[i].x, parts[i].y);
+          ctx.lineTo(parts[j].x, parts[j].y);
+          ctx.strokeStyle = `rgba(212,165,55,${0.28*(1-d/linkDist)})`;
+          ctx.stroke();
+        }
+      }
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  frame();
+  const onResize = () => { dpr = Math.min(window.devicePixelRatio||1, 2); size(canvas); size(aurora); W=canvas.width; H=canvas.height; };
+  window.addEventListener('resize', onResize);
+  return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); };
 }
 function hideLogin() {
   document.body.classList.add('signed-in'); document.body.classList.remove('locked');
   document.getElementById('loginScreen').style.display = 'none';
+  try { stopLoginAnimation(); } catch (e) {}
   // Reset the per-session "intro already played" flag so every sign-in
   // (even after logout-then-login in the same browser tab) triggers the full
   // cinematic animation.
@@ -5494,6 +5709,12 @@ function hideLogin() {
 
 /* === Google sign-in via Firebase Auth === */
 async function handleGoogleSignin() {
+  // CRITICAL: resume audio context here (a user gesture) so subsequent sounds work.
+  // Without this, all calls to playSound() are silent because the AudioContext is suspended.
+  try {
+    const ctx = getAudio();
+    if (ctx && ctx.state === 'suspended') await ctx.resume();
+  } catch (e) {}
   const api = window.firebaseApi;
   const errEl = document.getElementById('loginErr');
   const statusEl = document.getElementById('loginStatus');
@@ -5982,9 +6203,9 @@ function boot() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('DOMContentLoaded', () => { boot(); try { startLoginAnimation(); } catch(e) {} });
 } else {
-  boot();
+  boot(); try { startLoginAnimation(); } catch(e) {}
 }
 
 window.addEventListener('error', e => console.error('[Error]', e.message, e.filename, e.lineno));
@@ -6468,10 +6689,15 @@ function bindSoundToggle() {
   const btn = document.getElementById('soundToggle');
   if (!btn) return;
   updateSoundToggleUI();
-  btn.onclick = () => {
+  btn.onclick = async () => {
     _soundOn = !_soundOn;
     localStorage.setItem(SOUND_KEY, _soundOn ? '1' : '0');
     updateSoundToggleUI();
+    // Resume audio context (required by browser autoplay policy)
+    try {
+      const ctx = getAudio();
+      if (ctx && ctx.state === 'suspended') await ctx.resume();
+    } catch (e) {}
     if (_soundOn) playSound('ting');
   };
 }
