@@ -89,13 +89,10 @@
   --radius: 14px; --radius-sm: 8px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-/* Disable global smooth scroll — it makes the "focus jump" on mobile visible
-   as a long upward animation. Mobile browsers auto-scroll focused checkboxes
-   into view; combined with smooth-scroll it looks like the page "goes up".
-   We keep smooth scroll for explicit navigation by setting behavior:'smooth'
-   on those scrollTo calls directly. */
-html { scroll-behavior: auto; overflow-anchor: none; }
-body { overflow-anchor: none; }
+/* No smooth scroll globally — explicit scrollTo calls set behavior:'smooth' when needed.
+   Keep overflow-anchor at default (auto) — that PREVENTS scroll shifts when content
+   is added/removed elsewhere on the page (browser anchors your view to what you're reading). */
+html { scroll-behavior: auto; }
 .topic-item input[type="checkbox"] { scroll-margin: 999px; }  /* don't auto-scroll into view on focus */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -4686,6 +4683,13 @@ function topicProgress(course) {
   return { done, total, pct: Math.round((done / total) * 100) };
 }
 function toggleTopic(courseId, topicId) {
+  // BRUTE FORCE scroll pin: capture position NOW, restore it across many frames
+  // to override anything that tries to move the scroll (browser focus-scroll,
+  // layout shifts, etc.). This is the most aggressive defense against the
+  // "page goes up" bug — nothing can move the scroll while these timers fire.
+  const pinnedY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+  const pin = () => window.scrollTo({ top: pinnedY, left: 0, behavior: 'auto' });
+
   const cs = getCourseState(courseId);
   const i = cs.completedTopics.indexOf(topicId);
   if (i >= 0) cs.completedTopics.splice(i, 1);
@@ -4693,12 +4697,19 @@ function toggleTopic(courseId, topicId) {
   const today = new Date().toISOString().slice(0, 10);
   state.daily[today] = (state.daily[today] || 0) + 1;
   saveState();
-  // BUG FIX: do NOT call full render() here — that wipes the DOM and the browser
-  // scrolls to the top before our scroll restoration can run, causing the page
-  // to jump. Instead, surgically update only the bits that change: the topic
-  // row's "done" class, the course's progress bar, the phase nav count, and the
-  // small daily counter on the hero.
+
+  // Surgical DOM update — no full re-render, no phase nav rebuild, no hero rebuild
   surgicalTopicUpdate(courseId, topicId);
+
+  // Pin scroll across many frames in case ANYTHING tries to move it
+  pin();
+  requestAnimationFrame(pin);
+  requestAnimationFrame(() => requestAnimationFrame(pin));
+  setTimeout(pin, 0);
+  setTimeout(pin, 16);
+  setTimeout(pin, 50);
+  setTimeout(pin, 120);
+  setTimeout(pin, 250);
 }
 
 // Update only the affected UI bits without a full re-render — keeps scroll position.
@@ -4733,11 +4744,30 @@ function surgicalTopicUpdate(courseId, topicId) {
     if (titleCount) titleCount.textContent = `Chapter Sections (${tp.done}/${tp.total})`;
   }
 
-  // 3. Update the phase nav count for the current phase
-  try { renderPhaseNav(); } catch (e) {}
+  // 3. Surgically update the phase nav badge (just the count text — NOT a re-render
+  //    of the whole nav, which would cause a layout shift at the top of the page).
+  try {
+    const phaseTotalTopics = phase.courses.reduce((s, c) => s + c.courses ? 0 : (c.topics ? c.topics.length : 0), 0);
+    const phaseDoneTopics = phase.courses.reduce((s, c) => s + topicProgress(c).done, 0);
+    const totalAll = phase.courses.reduce((s, c) => s + (c.topics ? c.topics.length : 0), 0);
+    const phaseTabs = document.querySelectorAll('#phaseNav .phase-tab');
+    phaseTabs.forEach(tab => {
+      // each tab's last span is the count badge "p/total"
+      const countSpan = tab.querySelector('.pcount');
+      if (countSpan && tab.classList.contains('active')) {
+        countSpan.textContent = `${phaseDoneTopics}/${totalAll}`;
+      }
+    });
+  } catch (e) {}
 
-  // 4. Update the hero / daily counter
-  try { renderHero(); } catch (e) {}
+  // 4. Surgically update hero daily counter (NOT a re-render).
+  //    Skip if the hero stat element isn't easily findable — it'll update on next
+  //    phase/section switch anyway.
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const dailyEl = document.querySelector('[data-stat="daily"]');
+    if (dailyEl) dailyEl.textContent = state.daily[today] || 0;
+  } catch (e) {}
 }
 
 /* === Phase lock logic (per-section: E1→E2... and M1→M2... are independent) === */
