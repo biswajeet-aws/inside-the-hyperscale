@@ -4824,9 +4824,8 @@ function renderSectionTabs() {
         const firstPhase = phasesInSection(id)[0];
         if (firstPhase) { activePhaseId = firstPhase.id; state.activePhase = firstPhase.id; }
         saveState();
-        _skipScrollRestore = true;  // intentional jump — switching section
+        // Stay where the user was — render() will preserve scroll position.
         render();
-        window.scrollTo({top:0,behavior:'smooth'});
       }
     }, [
       el('div', { class: 'st-main' }, [label]),
@@ -4853,9 +4852,8 @@ function renderPhaseNav() {
           return;
         }
         activePhaseId = p.id; state.activePhase = p.id; saveState();
-        _skipScrollRestore = true;  // intentional jump — switching phase
+        // Stay where the user was — render() will preserve scroll position.
         render();
-        window.scrollTo({top:0,behavior:'smooth'});
       }
     }, [
       el('span', {}, [(locked ? '🔒 ' : passed ? '✓ ' : '') + p.icon + ' ' + (p.sectionLabel || p.label)]),
